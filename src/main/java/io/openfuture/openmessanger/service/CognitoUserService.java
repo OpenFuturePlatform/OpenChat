@@ -33,4 +33,5 @@ public interface CognitoUserService {
             String username, String smsCode, String session);
 
     AdminListUserAuthEventsResult getUserAuthEvents(String username, int maxResult, String nextToken);
+
 }

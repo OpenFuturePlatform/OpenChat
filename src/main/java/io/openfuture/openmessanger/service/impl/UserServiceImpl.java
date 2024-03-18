@@ -38,14 +38,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public BaseResponse authenticate(LoginRequest userLogin) {
 
-        AdminInitiateAuthResult result = cognitoUserService.initiateAuth(userLogin.getUsername(), userLogin.getPassword())
-                                                           .orElseThrow(() -> new UserNotFoundException(String.format("Username %s  not found.", userLogin.getUsername())));
+        AdminInitiateAuthResult result = cognitoUserService.initiateAuth(userLogin.getEmail(), userLogin.getPassword())
+                                                           .orElseThrow(() -> new UserNotFoundException(String.format("Username %s  not found.", userLogin.getEmail())));
 
         if (ObjectUtils.nullSafeEquals(NEW_PASSWORD_REQUIRED.name(), result.getChallengeName())) {
             return new BaseResponse(AuthenticatedChallengeRequest.builder()
                                                                  .challengeType(NEW_PASSWORD_REQUIRED.name())
                                                                  .sessionId(result.getSession())
-                                                                 .username(userLogin.getUsername())
+                                                                 .username(userLogin.getEmail())
                                                                  .build(), "First time login - Password change required", false);
         }
 
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
             return new BaseResponse(AuthenticatedChallengeRequest.builder()
                                                                  .challengeType(SMS_MFA.name())
                                                                  .sessionId(result.getSession())
-                                                                 .username(userLogin.getUsername())
+                                                                 .username(userLogin.getEmail())
                                                                  .build(), "We sent a code to your phone number", false);
         }
 
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
                                                      .accessToken(result.getAuthenticationResult().getAccessToken())
                                                      .idToken(result.getAuthenticationResult().getIdToken())
                                                      .refreshToken(result.getAuthenticationResult().getRefreshToken())
-                                                     .username(userLogin.getUsername())
+                                                     .username(userLogin.getEmail())
                                                      .build(), "Login successful", false);
     }
 
@@ -112,4 +112,5 @@ public class UserServiceImpl implements UserService {
     public AdminListUserAuthEventsResult userAuthEvents(String username, int maxResult, String nextToken) {
         return cognitoUserService.getUserAuthEvents(username, maxResult, nextToken);
     }
+
 }

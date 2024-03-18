@@ -53,6 +53,11 @@ public class AuthController {
         return new ResponseEntity<>(userService.authenticate(loginRequest), HttpStatus.OK);
     }
 
+    @GetMapping("/current")
+    public ResponseEntity<BaseResponse> current() {
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/login-sms-verify")
     public ResponseEntity<AuthenticatedResponse> loginSmsVerify(@RequestBody @Validated LoginSmsVerifyRequest loginSmsVerifyRequest) {
         return new ResponseEntity<>(userService.authenticateSms(loginSmsVerifyRequest), HttpStatus.OK);
@@ -94,7 +99,6 @@ public class AuthController {
         AdminListUserAuthEventsResult result = userService.userAuthEvents(username, maxResult, nextToken);
         return new ResponseEntity<>(new BaseResponse(
                 result, "user data", false), HttpStatus.OK);
-
     }
 
 }

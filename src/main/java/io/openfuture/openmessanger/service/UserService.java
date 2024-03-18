@@ -29,4 +29,5 @@ public interface UserService {
     UserType createUser(UserSignUpRequest signUpDTO);
 
     AdminListUserAuthEventsResult userAuthEvents(String username, int maxResult, String nextToken);
+
 }

@@ -67,25 +67,28 @@ public class CognitoUserServiceImpl implements CognitoUserService {
 
 
     @Override
-    public UserType signUp(UserSignUpRequest signUpDTO) {
+    public UserType signUp(UserSignUpRequest request) {
+        final String username = calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), request.getEmail());
+
         try {
             final AdminCreateUserRequest signUpRequest = new AdminCreateUserRequest()
                     .withUserPoolId(awsConfig.getCognito().getUserPoolId())
                     .withTemporaryPassword(generateValidPassword())
                     .withDesiredDeliveryMediums(DeliveryMediumType.EMAIL)
-                    .withUsername(signUpDTO.getEmail())
+                    .withUsername(username)
                     .withMessageAction(MessageActionType.SUPPRESS)
                     .withUserAttributes(
-                            new AttributeType().withName("name").withValue(signUpDTO.getFirstName()),
-                            new AttributeType().withName("email").withValue(signUpDTO.getEmail()),
+                            new AttributeType().withName("given_name").withValue(request.getFirstName()),
+                            new AttributeType().withName("family_name").withValue(request.getLastName()),
+                            new AttributeType().withName("email").withValue(request.getEmail()),
                             new AttributeType().withName("email_verified").withValue("true"));
 
             AdminCreateUserResult createUserResult = awsCognitoIdentityProvider.adminCreateUser(signUpRequest);
-            log.info("Created User id: {}", createUserResult.getUser().getUsername());
+            log.info("Created User id: {}, email: {}", createUserResult.getUser().getUsername(), request.getEmail());
 
-            signUpDTO.getRoles().forEach(r -> addUserToGroup(signUpDTO.getEmail(), r));
+            request.getRoles().forEach(r -> addUserToGroup(request.getEmail(), r));
 
-            setUserPassword(signUpDTO.getEmail(), signUpDTO.getPassword());
+            setUserPassword(request.getEmail(), request.getPassword());
 
             return createUserResult.getUser();
 
@@ -213,7 +216,6 @@ public class CognitoUserServiceImpl implements CognitoUserService {
             throw new io.openfuture.openmessanger.exception.InvalidParameterException(String.format("Amazon Cognito service encounters an invalid parameter %s", e.getErrorMessage()), e);
         }
     }
-
 
     @Override
     public GlobalSignOutResult signOut(String accessToken) {
