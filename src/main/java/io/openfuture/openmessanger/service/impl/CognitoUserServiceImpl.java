@@ -20,14 +20,39 @@ import org.passay.PasswordGenerator;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
-import com.amazonaws.services.cognitoidp.model.*;
+import com.amazonaws.services.cognitoidp.model.AdminAddUserToGroupRequest;
+import com.amazonaws.services.cognitoidp.model.AdminCreateUserRequest;
+import com.amazonaws.services.cognitoidp.model.AdminCreateUserResult;
+import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
+import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
+import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsRequest;
+import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
+import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeRequest;
+import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeResult;
+import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordRequest;
+import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordResult;
+import com.amazonaws.services.cognitoidp.model.AttributeType;
+import com.amazonaws.services.cognitoidp.model.AuthFlowType;
+import com.amazonaws.services.cognitoidp.model.DeliveryMediumType;
+import com.amazonaws.services.cognitoidp.model.ForgotPasswordRequest;
+import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
+import com.amazonaws.services.cognitoidp.model.GlobalSignOutRequest;
+import com.amazonaws.services.cognitoidp.model.GlobalSignOutResult;
+import com.amazonaws.services.cognitoidp.model.InternalErrorException;
+import com.amazonaws.services.cognitoidp.model.InvalidParameterException;
+import com.amazonaws.services.cognitoidp.model.MessageActionType;
+import com.amazonaws.services.cognitoidp.model.NotAuthorizedException;
+import com.amazonaws.services.cognitoidp.model.UserNotFoundException;
+import com.amazonaws.services.cognitoidp.model.UserPoolAddOnNotEnabledException;
+import com.amazonaws.services.cognitoidp.model.UserType;
+import com.amazonaws.services.cognitoidp.model.UsernameExistsException;
+
 import io.openfuture.openmessanger.configuration.AwsConfig;
 import io.openfuture.openmessanger.domain.enums.CognitoAttributesEnum;
 import io.openfuture.openmessanger.exception.FailedAuthenticationException;
 import io.openfuture.openmessanger.exception.ServiceException;
 import io.openfuture.openmessanger.service.CognitoUserService;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,7 +68,6 @@ public class CognitoUserServiceImpl implements CognitoUserService {
 
     @Override
     public UserType signUp(UserSignUpRequest signUpDTO) {
-
         try {
             final AdminCreateUserRequest signUpRequest = new AdminCreateUserRequest()
                     .withUserPoolId(awsConfig.getCognito().getUserPoolId())
@@ -54,9 +78,7 @@ public class CognitoUserServiceImpl implements CognitoUserService {
                     .withUserAttributes(
                             new AttributeType().withName("name").withValue(signUpDTO.getFirstName()),
                             new AttributeType().withName("email").withValue(signUpDTO.getEmail()),
-                            new AttributeType().withName("email_verified").withValue("true"),
-                            new AttributeType().withName("phone_number").withValue(signUpDTO.getPhoneNumber()),
-                            new AttributeType().withName("phone_number_verified").withValue("true"));
+                            new AttributeType().withName("email_verified").withValue("true"));
 
             AdminCreateUserResult createUserResult = awsCognitoIdentityProvider.adminCreateUser(signUpRequest);
             log.info("Created User id: {}", createUserResult.getUser().getUsername());
@@ -79,7 +101,6 @@ public class CognitoUserServiceImpl implements CognitoUserService {
     public void addUserToGroup(String username, String groupName) {
 
         try {
-            // add user to group
             AdminAddUserToGroupRequest addUserToGroupRequest = new AdminAddUserToGroupRequest()
                     .withGroupName(groupName)
                     .withUserPoolId(awsConfig.getCognito().getUserPoolId())
