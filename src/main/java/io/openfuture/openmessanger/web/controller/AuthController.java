@@ -26,6 +26,7 @@ import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
 import io.openfuture.openmessanger.service.dto.UserPasswordUpdateRequest;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
+import io.openfuture.openmessanger.service.response.SignUpResponse;
 import io.openfuture.openmessanger.web.response.AuthenticatedResponse;
 import io.openfuture.openmessanger.web.response.BaseResponse;
 
@@ -41,11 +42,11 @@ public class AuthController {
     }
 
     @PostMapping(value = "/signup")
-    public ResponseEntity<BaseResponse> signUp(@RequestBody @Validated UserSignUpRequest signUpDTO) {
+    public SignUpResponse signUp(@RequestBody @Validated UserSignUpRequest signUpDTO) {
         UserType result = userService.createUser(signUpDTO);
-        return new ResponseEntity<>(new BaseResponse(
-                result,
-                "User account created successfully", false), HttpStatus.CREATED);
+        return new SignUpResponse("User account created successfully", new SignUpResponse.Data(signUpDTO.getEmail(),
+                                                                                               signUpDTO.getFirstName(),
+                                                                                               signUpDTO.getLastName()));
     }
 
     @PostMapping("/login")
