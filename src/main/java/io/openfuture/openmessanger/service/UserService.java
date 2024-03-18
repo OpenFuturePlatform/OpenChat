@@ -10,13 +10,14 @@ import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
 import io.openfuture.openmessanger.service.dto.UserPasswordUpdateRequest;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
+import io.openfuture.openmessanger.service.response.LoginResponse;
 import io.openfuture.openmessanger.web.response.AuthenticatedResponse;
 import io.openfuture.openmessanger.web.response.BaseResponse;
 
 
 public interface UserService {
 
-    BaseResponse authenticate(LoginRequest userLogin);
+    AuthenticatedResponse authenticate(LoginRequest userLogin);
 
     AuthenticatedResponse authenticateSms(LoginSmsVerifyRequest loginSmsVerifyRequest);
 

@@ -26,6 +26,7 @@ import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
 import io.openfuture.openmessanger.service.dto.UserPasswordUpdateRequest;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
+import io.openfuture.openmessanger.service.response.LoginResponse;
 import io.openfuture.openmessanger.service.response.SignUpResponse;
 import io.openfuture.openmessanger.web.response.AuthenticatedResponse;
 import io.openfuture.openmessanger.web.response.BaseResponse;
@@ -50,8 +51,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<BaseResponse> login(@RequestBody @Validated LoginRequest loginRequest) {
-        return new ResponseEntity<>(userService.authenticate(loginRequest), HttpStatus.OK);
+    public LoginResponse login(@RequestBody @Validated LoginRequest loginRequest) {
+        final AuthenticatedResponse authenticate = userService.authenticate(loginRequest);
+        return new LoginResponse(authenticate.getAccessToken(), "User logged in Successfully", authenticate.getRefreshToken());
     }
 
     @GetMapping("/current")

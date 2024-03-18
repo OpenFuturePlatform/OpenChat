@@ -22,8 +22,8 @@ import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
 import io.openfuture.openmessanger.service.dto.UserPasswordUpdateRequest;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
+import io.openfuture.openmessanger.service.response.LoginResponse;
 import io.openfuture.openmessanger.web.response.AuthenticatedResponse;
-import io.openfuture.openmessanger.web.response.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,33 +36,31 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public BaseResponse authenticate(LoginRequest userLogin) {
+    public AuthenticatedResponse authenticate(LoginRequest userLogin) {
 
         AdminInitiateAuthResult result = cognitoUserService.initiateAuth(userLogin.getEmail(), userLogin.getPassword())
                                                            .orElseThrow(() -> new UserNotFoundException(String.format("Username %s  not found.", userLogin.getEmail())));
 
         if (ObjectUtils.nullSafeEquals(NEW_PASSWORD_REQUIRED.name(), result.getChallengeName())) {
-            return new BaseResponse(AuthenticatedChallengeRequest.builder()
-                                                                 .challengeType(NEW_PASSWORD_REQUIRED.name())
-                                                                 .sessionId(result.getSession())
-                                                                 .username(userLogin.getEmail())
-                                                                 .build(), "First time login - Password change required", false);
+            AuthenticatedChallengeRequest.builder()
+                                                .challengeType(NEW_PASSWORD_REQUIRED.name())
+                                                .sessionId(result.getSession())
+                                                .username(userLogin.getEmail())
+                                                .build();
         }
 
         if (ObjectUtils.nullSafeEquals(SMS_MFA.name(), result.getChallengeName())) {
-            return new BaseResponse(AuthenticatedChallengeRequest.builder()
-                                                                 .challengeType(SMS_MFA.name())
-                                                                 .sessionId(result.getSession())
-                                                                 .username(userLogin.getEmail())
-                                                                 .build(), "We sent a code to your phone number", false);
+            AuthenticatedChallengeRequest.builder().challengeType(SMS_MFA.name())
+                                                .sessionId(result.getSession())
+                                                .username(userLogin.getEmail()).build();
         }
 
-        return new BaseResponse(AuthenticatedResponse.builder()
-                                                     .accessToken(result.getAuthenticationResult().getAccessToken())
-                                                     .idToken(result.getAuthenticationResult().getIdToken())
-                                                     .refreshToken(result.getAuthenticationResult().getRefreshToken())
-                                                     .username(userLogin.getEmail())
-                                                     .build(), "Login successful", false);
+        return AuthenticatedResponse.builder()
+                .accessToken(result.getAuthenticationResult().getAccessToken())
+                .idToken(result.getAuthenticationResult().getIdToken())
+                .refreshToken(result.getAuthenticationResult().getRefreshToken())
+                .username(userLogin.getEmail())
+                .build();
     }
 
     @Override
