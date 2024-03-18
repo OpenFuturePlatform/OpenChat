@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
                                                 .username(userLogin.getEmail()).build();
         }
 
-        users.put(userLogin.getEmail(), result.getAuthenticationResult().getAccessToken());
+        users.put(result.getAuthenticationResult().getAccessToken(), userLogin.getEmail());
         return AuthenticatedResponse.builder()
                 .accessToken(result.getAuthenticationResult().getAccessToken())
                 .idToken(result.getAuthenticationResult().getIdToken())
