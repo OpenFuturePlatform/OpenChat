@@ -128,7 +128,10 @@ public class UserServiceImpl implements UserService {
         return new UserResponse(userDetails.getUsername(),
                          get("given_name", userAttributes).getValue(),
                          get("family_name", userAttributes).getValue(),
-                         get("email", userAttributes).getValue());
+                         get("email", userAttributes).getValue(),
+                                "",
+                                "",
+                                "");
     }
 
     AttributeType get(String name, List<AttributeType> attributeTypes) {

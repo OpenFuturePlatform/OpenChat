@@ -12,4 +12,7 @@ public class UserResponse {
     String firstName;
     String lastName;
     String email;
+    String orgId;
+    String modifiedTime;
+    String role;
 }
