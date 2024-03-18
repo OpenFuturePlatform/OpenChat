@@ -23,6 +23,8 @@ import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.AdminAddUserToGroupRequest;
 import com.amazonaws.services.cognitoidp.model.AdminCreateUserRequest;
 import com.amazonaws.services.cognitoidp.model.AdminCreateUserResult;
+import com.amazonaws.services.cognitoidp.model.AdminGetUserRequest;
+import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsRequest;
@@ -155,14 +157,14 @@ public class CognitoUserServiceImpl implements CognitoUserService {
             String username, String newPassword, String session) {
         AdminRespondToAuthChallengeRequest request = new AdminRespondToAuthChallengeRequest();
         request.withChallengeName(NEW_PASSWORD_REQUIRED)
-                .withUserPoolId(awsConfig.getCognito().getUserPoolId())
-                .withClientId(awsConfig.getCognito().getAppClientId())
-                .withSession(session)
-                .addChallengeResponsesEntry("userAttributes.name", "aek")
-                .addChallengeResponsesEntry(CognitoAttributesEnum.USERNAME.name(), username)
-                .addChallengeResponsesEntry(CognitoAttributesEnum.NEW_PASSWORD.name(), newPassword)
-                .addChallengeResponsesEntry(CognitoAttributesEnum.SECRET_HASH.name(), calculateSecretHash(awsConfig.getCognito().getAppClientId(),
-                                                                                                          awsConfig.getCognito().getAppClientSecret(), username));
+               .withUserPoolId(awsConfig.getCognito().getUserPoolId())
+               .withClientId(awsConfig.getCognito().getAppClientId())
+               .withSession(session)
+               .addChallengeResponsesEntry("userAttributes.name", "aek")
+               .addChallengeResponsesEntry(CognitoAttributesEnum.USERNAME.name(), username)
+               .addChallengeResponsesEntry(CognitoAttributesEnum.NEW_PASSWORD.name(), newPassword)
+               .addChallengeResponsesEntry(CognitoAttributesEnum.SECRET_HASH.name(), calculateSecretHash(awsConfig.getCognito().getAppClientId(),
+                                                                                                         awsConfig.getCognito().getAppClientSecret(), username));
 
         try {
             return Optional.of(awsCognitoIdentityProvider.adminRespondToAuthChallenge(request));
@@ -180,13 +182,13 @@ public class CognitoUserServiceImpl implements CognitoUserService {
             String username, String smsCode, String session) {
         AdminRespondToAuthChallengeRequest request = new AdminRespondToAuthChallengeRequest();
         request.withChallengeName(SMS_MFA)
-                .withUserPoolId(awsConfig.getCognito().getUserPoolId())
-                .withClientId(awsConfig.getCognito().getAppClientId())
-                .withSession(session)
-                .addChallengeResponsesEntry("userAttributes.name", "aek")
-                .addChallengeResponsesEntry(CognitoAttributesEnum.USERNAME.name(), username)
-                .addChallengeResponsesEntry(CognitoAttributesEnum.SMS_MFA_CODE.name(), smsCode)
-                .addChallengeResponsesEntry(CognitoAttributesEnum.SECRET_HASH.name(), calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), username));
+               .withUserPoolId(awsConfig.getCognito().getUserPoolId())
+               .withClientId(awsConfig.getCognito().getAppClientId())
+               .withSession(session)
+               .addChallengeResponsesEntry("userAttributes.name", "aek")
+               .addChallengeResponsesEntry(CognitoAttributesEnum.USERNAME.name(), username)
+               .addChallengeResponsesEntry(CognitoAttributesEnum.SMS_MFA_CODE.name(), smsCode)
+               .addChallengeResponsesEntry(CognitoAttributesEnum.SECRET_HASH.name(), calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), username));
 
         try {
             return Optional.of(awsCognitoIdentityProvider.adminRespondToAuthChallenge(request));
@@ -227,12 +229,19 @@ public class CognitoUserServiceImpl implements CognitoUserService {
     }
 
     @Override
+    public AdminGetUserResult getUserDetails(String email) {
+        return awsCognitoIdentityProvider
+                .adminGetUser(new AdminGetUserRequest().withUsername(email)
+                                                       .withUserPoolId(awsConfig.getCognito().getUserPoolId()));
+    }
+
+    @Override
     public ForgotPasswordResult forgotPassword(String username) {
         try {
             ForgotPasswordRequest request = new ForgotPasswordRequest();
             request.withClientId(awsConfig.getCognito().getAppClientId())
-                    .withUsername(username)
-                    .withSecretHash(calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), username));
+                   .withUsername(username)
+                   .withSecretHash(calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), username));
 
             return awsCognitoIdentityProvider.forgotPassword(request);
 
@@ -296,7 +305,7 @@ public class CognitoUserServiceImpl implements CognitoUserService {
         splCharRule.setNumberOfCharacters(2);
 
         return gen.generatePassword(10, splCharRule, lowerCaseRule,
-                upperCaseRule, digitRule);
+                                    upperCaseRule, digitRule);
     }
 
 }

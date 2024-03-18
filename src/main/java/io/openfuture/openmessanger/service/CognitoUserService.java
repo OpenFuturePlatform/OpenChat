@@ -2,6 +2,7 @@ package io.openfuture.openmessanger.service;
 
 import java.util.Optional;
 
+import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeResult;
@@ -20,6 +21,8 @@ public interface CognitoUserService {
             String username, String newPassword, String session);
 
     GlobalSignOutResult signOut(String accessToken);
+
+    AdminGetUserResult getUserDetails(String email);
 
     ForgotPasswordResult forgotPassword(String username);
 

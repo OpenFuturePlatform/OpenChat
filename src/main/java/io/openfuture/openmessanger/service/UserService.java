@@ -10,9 +10,8 @@ import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
 import io.openfuture.openmessanger.service.dto.UserPasswordUpdateRequest;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
-import io.openfuture.openmessanger.service.response.LoginResponse;
+import io.openfuture.openmessanger.service.response.UserResponse;
 import io.openfuture.openmessanger.web.response.AuthenticatedResponse;
-import io.openfuture.openmessanger.web.response.BaseResponse;
 
 
 public interface UserService {
@@ -31,4 +30,5 @@ public interface UserService {
 
     AdminListUserAuthEventsResult userAuthEvents(String username, int maxResult, String nextToken);
 
+    UserResponse getCurrent(String token);
 }

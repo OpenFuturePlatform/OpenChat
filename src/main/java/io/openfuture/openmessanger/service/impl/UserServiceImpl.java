@@ -3,14 +3,19 @@ package io.openfuture.openmessanger.service.impl;
 import static com.amazonaws.services.cognitoidp.model.ChallengeNameType.NEW_PASSWORD_REQUIRED;
 import static com.amazonaws.services.cognitoidp.model.ChallengeNameType.SMS_MFA;
 
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.validation.constraints.NotNull;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeResult;
+import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
 import com.amazonaws.services.cognitoidp.model.UserType;
 
@@ -22,7 +27,7 @@ import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
 import io.openfuture.openmessanger.service.dto.UserPasswordUpdateRequest;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
-import io.openfuture.openmessanger.service.response.LoginResponse;
+import io.openfuture.openmessanger.service.response.UserResponse;
 import io.openfuture.openmessanger.web.response.AuthenticatedResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +39,7 @@ public class UserServiceImpl implements UserService {
 
     private final CognitoUserService cognitoUserService;
 
+    private ConcurrentHashMap<String, String> users = new ConcurrentHashMap<>();
 
     @Override
     public AuthenticatedResponse authenticate(LoginRequest userLogin) {
@@ -55,6 +61,7 @@ public class UserServiceImpl implements UserService {
                                                 .username(userLogin.getEmail()).build();
         }
 
+        users.put(userLogin.getEmail(), result.getAuthenticationResult().getAccessToken());
         return AuthenticatedResponse.builder()
                 .accessToken(result.getAuthenticationResult().getAccessToken())
                 .idToken(result.getAuthenticationResult().getIdToken())
@@ -109,6 +116,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public AdminListUserAuthEventsResult userAuthEvents(String username, int maxResult, String nextToken) {
         return cognitoUserService.getUserAuthEvents(username, maxResult, nextToken);
+    }
+
+    @Override
+    public UserResponse getCurrent(final String token) {
+        final String email = users.get(token);
+        final AdminGetUserResult userDetails = cognitoUserService.getUserDetails(email);
+
+        final List<AttributeType> userAttributes = userDetails.getUserAttributes();
+
+        return new UserResponse(userDetails.getUsername(),
+                         get("given_name", userAttributes).getValue(),
+                         get("family_name", userAttributes).getValue(),
+                         get("email", userAttributes).getValue());
+    }
+
+    AttributeType get(String name, List<AttributeType> attributeTypes) {
+        return attributeTypes.stream().filter(attributeType -> attributeType.getName().equals(name)).findFirst().get();
     }
 
 }
