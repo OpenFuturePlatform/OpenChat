@@ -31,7 +31,7 @@ import io.openfuture.openmessanger.web.response.BaseResponse;
 
 @RestController
 @Validated
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/public")
 public class AuthController {
 
     private final UserService userService;
@@ -40,7 +40,7 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "/sign-up")
+    @PostMapping(value = "/signup")
     public ResponseEntity<BaseResponse> signUp(@RequestBody @Validated UserSignUpRequest signUpDTO) {
         UserType result = userService.createUser(signUpDTO);
         return new ResponseEntity<>(new BaseResponse(
