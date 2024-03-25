@@ -8,6 +8,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -52,6 +54,7 @@ import com.amazonaws.services.cognitoidp.model.UsernameExistsException;
 import io.openfuture.openmessanger.configuration.AwsConfig;
 import io.openfuture.openmessanger.domain.enums.CognitoAttributesEnum;
 import io.openfuture.openmessanger.exception.FailedAuthenticationException;
+import io.openfuture.openmessanger.exception.InvalidPasswordException;
 import io.openfuture.openmessanger.exception.ServiceException;
 import io.openfuture.openmessanger.service.CognitoUserService;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
@@ -70,6 +73,9 @@ public class CognitoUserServiceImpl implements CognitoUserService {
 
     @Override
     public UserType signUp(UserSignUpRequest request) {
+        if (validatePassword(request.getPassword())) {
+            throw new InvalidPasswordException("Password is too weak");
+        }
         final String username = calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), request.getEmail());
 
         try {
@@ -276,6 +282,14 @@ public class CognitoUserServiceImpl implements CognitoUserService {
         } catch (Exception e) {
             throw new ServiceException("Error while calculating ", e);
         }
+    }
+
+    private boolean validatePassword(final String password) {
+        String regExpn = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+
+        Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(password);
+        return matcher.matches();
     }
 
     private String generateValidPassword() {
