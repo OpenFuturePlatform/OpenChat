@@ -23,4 +23,10 @@ public class MessageController {
         return messageService.getAllByRecipient(recipient);
     }
 
+    @GetMapping(value = "/recipient/{recipient}/from/{sender}")
+    public List<MessageResponse> getByRecipientAndSender(@PathVariable("recipient") String recipient,
+                                                         @PathVariable("sender") String sender) {
+        return messageService.getAllByRecipientAndSender(recipient, sender);
+    }
+
 }

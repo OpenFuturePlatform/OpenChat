@@ -35,6 +35,17 @@ public class MessageServiceImpl implements MessageService {
     public List<MessageResponse> getAllByRecipient(final String recipient) {
         final List<MessageEntity> messageEntities = messageRepository.findByRecipient(recipient);
 
+        return convertToMessageResponse(messageEntities);
+    }
+
+    @Override
+    public List<MessageResponse> getAllByRecipientAndSender(final String recipient, final String sender) {
+        final List<MessageEntity> messageEntities = messageRepository.findByRecipientAndSender(recipient, sender);
+
+        return convertToMessageResponse(messageEntities);
+    }
+
+    private List<MessageResponse> convertToMessageResponse(final List<MessageEntity> messageEntities) {
         return messageEntities.stream()
                               .map(message -> new MessageResponse(message.getId(),
                                                                   message.getSender(),
