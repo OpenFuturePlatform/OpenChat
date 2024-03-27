@@ -32,10 +32,11 @@ public class AttachmentController {
     @GetMapping(value = "/{fileName}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void download(final HttpServletResponse response, @PathVariable(value = "fileName") final String fileName) throws IOException {
         final byte[] fileData = attachmentService.download(fileName);
+
         response.reset();
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName);
-        response.setContentLength(fileName.length());
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment" + fileName);
+        response.setContentLength(fileData.length);
         response.getOutputStream().write(fileData);
         response.flushBuffer();
     }

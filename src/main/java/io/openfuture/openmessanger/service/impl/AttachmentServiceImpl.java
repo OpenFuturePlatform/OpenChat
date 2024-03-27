@@ -1,5 +1,7 @@
 package io.openfuture.openmessanger.service.impl;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.springframework.stereotype.Service;
@@ -39,12 +41,10 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public byte[] download(final String fileName) throws IOException {
-        GetObjectRequest getObjectRequest = new GetObjectRequest(DEFAULT_BUCKET, fileName);
+        S3Object o = amazonS3.getObject(DEFAULT_BUCKET, fileName);
+        S3ObjectInputStream s3is = o.getObjectContent();
 
-        S3Object s3Object = amazonS3.getObject(getObjectRequest);
-
-        S3ObjectInputStream objectInputStream = s3Object.getObjectContent();
-        return IOUtils.toByteArray(objectInputStream);
+        return IOUtils.toByteArray(s3is);
     }
 
 }
