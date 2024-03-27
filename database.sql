@@ -18,3 +18,16 @@ create table attachment
     name varchar(255),
     url  varchar(255)
 );
+
+create table user
+(
+    id            int auto_increment primary key,
+    email         varchar(255),
+    phone_number  varchar(255),
+    registered_at timestamp,
+    last_login    timestamp,
+    first_name    varchar(255),
+    last_name     varchar(255),
+    avatar        varchar(255),
+    active        bool default true
+);
