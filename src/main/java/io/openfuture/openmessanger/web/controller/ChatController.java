@@ -2,10 +2,10 @@ package io.openfuture.openmessanger.web.controller;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import io.openfuture.openmessanger.domain.Message;
+import io.openfuture.openmessanger.service.MessageService;
+import io.openfuture.openmessanger.web.request.MessageRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,12 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final MessageService messageService;
 
     @MessageMapping("/direct-message")
-    public Message recMessage(@Payload Message message){
-        simpMessagingTemplate.convertAndSendToUser(message.getReceiver(),"/direct", message);
-        return message;
+    public void sendMessage(@Payload MessageRequest request) {
+        messageService.sendMessage(request);
     }
 
 }

@@ -1,28 +1,46 @@
 package io.openfuture.openmessanger.service;
 
+import java.time.ZonedDateTime;
+import java.util.List;
+
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import io.openfuture.openmessanger.domain.Message;
-import io.openfuture.openmessanger.domain.User;
+import io.openfuture.openmessanger.repository.MessageRepository;
+import io.openfuture.openmessanger.repository.entity.MessageEntity;
+import io.openfuture.openmessanger.web.request.MessageRequest;
+import io.openfuture.openmessanger.web.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class MessageServiceImpl implements MessageService {
 
+    private final MessageRepository messageRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void sendMessage(final User sender, final String content) {
-        Message message = new Message();
-        message.setSender(sender.getUsername());
-        message.setBody(content);
-        log.info("Sent message {}", message);
+    public void sendMessage(final MessageRequest request) {
+        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), ZonedDateTime.now());
 
-        messagingTemplate.convertAndSend("/topic/chat", message);
+        messageRepository.save(message);
+        messagingTemplate.convertAndSendToUser(request.getRecipient(), "/direct", message);
+    }
+
+    @Override
+    public List<MessageResponse> getAllByRecipient(final String recipient) {
+        final List<MessageEntity> messageEntities = messageRepository.findByRecipient(recipient);
+
+        return messageEntities.stream()
+                              .map(message -> new MessageResponse(message.getId(),
+                                                                  message.getSender(),
+                                                                  message.getRecipient(),
+                                                                  message.getReceivedAt()))
+                              .toList();
     }
 
 }

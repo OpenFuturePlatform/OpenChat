@@ -13,5 +13,18 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
 
+  open-chat-mysql:
+    image: mysql:8.0.22
+    container_name: open-chat-mysql
+    hostname: open-chat-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=open_chat
+    ports:
+      - '3310:3306'
+    volumes:
+      - local-mysql-data:/var/lib/mysql
+
 volumes:
   rabbitmq-data:
+  local-mysql-data:

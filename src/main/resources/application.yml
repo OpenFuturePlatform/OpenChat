@@ -1,3 +1,17 @@
+spring:
+  application:
+    name: open-chat
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3310/open_chat?useSSL=false&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: ${spring.datasource.hikari.maximum-pool-size}
+  jpa:
+    hibernate:
+      ddl-auto: none
+
 aws:
   access-key: AKIAUSWCDIFRDTGV52OL
   secret-key: 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
