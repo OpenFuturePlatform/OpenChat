@@ -1,12 +1,11 @@
 package io.openfuture.openmessanger.service;
 
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.IOException;
+
+import org.springframework.web.multipart.MultipartFile;
 
 public interface AttachmentService {
+    void upload(MultipartFile file) throws IOException;
 
-    void upload(String bucketName, String fileName, InputStream stream);
-
-    FileOutputStream download(String bucketName, String fileName);
-
+    byte[] download(String fileName) throws IOException;
 }
