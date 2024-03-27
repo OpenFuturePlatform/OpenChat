@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
-import com.amazonaws.services.cognitoidp.model.UserType;
 
 import io.openfuture.openmessanger.service.UserService;
 import io.openfuture.openmessanger.service.dto.LoginRequest;
@@ -46,7 +45,7 @@ public class AuthController {
 
     @PostMapping(value = "/signup")
     public SignUpResponse signUp(@RequestBody @Validated UserSignUpRequest signUpDTO) {
-        UserType result = userService.createUser(signUpDTO);
+        userService.createUser(signUpDTO);
         return new SignUpResponse("User account created successfully", new SignUpResponse.Data(signUpDTO.getEmail(),
                                                                                                signUpDTO.getFirstName(),
                                                                                                signUpDTO.getLastName()));

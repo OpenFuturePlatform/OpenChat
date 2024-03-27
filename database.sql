@@ -17,4 +17,4 @@ create table attachment
     id   int auto_increment primary key,
     name varchar(255),
     url  varchar(255)
-)
+);

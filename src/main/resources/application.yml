@@ -17,6 +17,6 @@ aws:
   secret-key: /2poY+Og6+p5ax1n8YR9WNVZD6KnrdbDDwrXq0FW
   region: us-west-2
   cognito:
-    user-pool-id: us-west-2_K4uzzK1zZ
-    app-client-id: 1mfmeerca7g3l12nns3d24b7is
-    app-client-secret: 1ers1h1029101q4t3aph6b5m95b21dv7qprjbaeirqvej2etuc99
+    user-pool-id: us-west-2_aIKYDnG0g
+    app-client-id: lbl41afhrnidb37k8gjph6smv
+    app-client-secret: g2ur12s1gh2723f6t6gp5q4t88cu54d6qolkpa0vhps5pf7b65

@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserType createUser(UserSignUpRequest signUpDTO) {
+    public UserType createUser(final UserSignUpRequest signUpDTO) {
         return cognitoUserService.signUp(signUpDTO);
     }
 
