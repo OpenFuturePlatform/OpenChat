@@ -11,3 +11,10 @@ create table message
     sender      varchar(255),
     recipient   varchar(255)
 );
+
+create table attachment
+(
+    id   int auto_increment primary key,
+    name varchar(255),
+    url  varchar(255)
+)
