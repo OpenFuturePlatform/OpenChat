@@ -36,10 +36,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/v1/public/login").permitAll()
                         .requestMatchers("/api/v1/public/signup").permitAll()
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new AwsCognitoTokenFilter("/api/**", authenticationManager,
-                                                           "/api/v1/public/login", "/api/v1/public/signup"),
+                                                           "/**", "/api/v1/public/signup"),
                                  UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager)
                 .build();

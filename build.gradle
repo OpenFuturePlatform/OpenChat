@@ -35,6 +35,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-reactor-netty'
 
     implementation("com.amazonaws:aws-java-sdk-cognitoidp:1.12.681")
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.687'
     implementation("javax.validation:validation-api:2.0.1.Final")
 
 

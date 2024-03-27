@@ -1,6 +1,7 @@
 package io.openfuture.openmessanger.web.controller;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,10 @@ public class UserController {
     public Collection<User> getAllUsers() {
         final User user = new User("iccccccccc");
         return List.of(user);
+    }
+
+    public Collection<User> getMyContacts() {
+        return Collections.emptyList();
     }
 
 }
