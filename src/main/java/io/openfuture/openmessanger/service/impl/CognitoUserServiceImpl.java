@@ -20,6 +20,7 @@ import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.AdminAddUserToGroupRequest;
@@ -277,6 +278,9 @@ public class CognitoUserServiceImpl implements CognitoUserService {
     }
 
     private boolean validatePassword(final String password) {
+        if (StringUtils.hasText(password) && password.length() > 5) {
+            return false;
+        }
         String regExpn = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
 
         Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
