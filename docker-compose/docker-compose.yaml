@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    healthcheck:
+      test: rabbitmqctl node_health_check | grep -q '^Health check passed' || exit 1
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  open-chat-mysql:
+    image: mysql:8.0.22
+    container_name: open-chat-mysql
+    hostname: open-chat-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=open_chat
+    ports:
+      - '3310:3306'
+    volumes:
+      - local-mysql-data:/var/lib/mysql
+
+  open-chat-postgres:
+    container_name: open-chat-postgres
+    image: postgres
+    environment:
+      POSTGRES_DB: open_chat
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    volumes:
+      - local-postgres-data:/var/lib/postgres
+    ports:
+      - "5434:5432"
+volumes:
+  rabbitmq-data:
+  local-mysql-data:
+  local-postgres-data:

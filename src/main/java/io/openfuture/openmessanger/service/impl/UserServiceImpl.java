@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.validation.constraints.NotNull;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -17,9 +19,10 @@ import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
-import com.amazonaws.services.cognitoidp.model.UserType;
 
 import io.openfuture.openmessanger.exception.UserNotFoundException;
+import io.openfuture.openmessanger.repository.UserJpaRepository;
+import io.openfuture.openmessanger.repository.entity.User;
 import io.openfuture.openmessanger.service.CognitoUserService;
 import io.openfuture.openmessanger.service.UserService;
 import io.openfuture.openmessanger.service.dto.AuthenticatedChallengeRequest;
@@ -37,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final UserJpaRepository userJpaRepository;
     private final CognitoUserService cognitoUserService;
 
     private ConcurrentHashMap<String, String> users = new ConcurrentHashMap<>();
@@ -109,8 +113,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserType createUser(UserSignUpRequest signUpDTO) {
-        return cognitoUserService.signUp(signUpDTO);
+    public void createUser(final UserSignUpRequest signUpDTO) {
+        cognitoUserService.signUp(signUpDTO);
+
+        final User user = new User(signUpDTO.getEmail());
+        userJpaRepository.save(user);
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.AdminAddUserToGroupRequest;
@@ -72,18 +73,17 @@ public class CognitoUserServiceImpl implements CognitoUserService {
 
 
     @Override
-    public UserType signUp(UserSignUpRequest request) {
+    public UserType signUp(final UserSignUpRequest request) {
         if (validatePassword(request.getPassword())) {
             throw new InvalidPasswordException("Password is too weak");
         }
-        final String username = calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), request.getEmail());
 
         try {
             final AdminCreateUserRequest signUpRequest = new AdminCreateUserRequest()
                     .withUserPoolId(awsConfig.getCognito().getUserPoolId())
                     .withTemporaryPassword(generateValidPassword())
                     .withDesiredDeliveryMediums(DeliveryMediumType.EMAIL)
-                    .withUsername(username)
+                    .withUsername(request.getEmail())
                     .withMessageAction(MessageActionType.SUPPRESS)
                     .withUserAttributes(
                             new AttributeType().withName("given_name").withValue(request.getFirstName()),
@@ -99,7 +99,6 @@ public class CognitoUserServiceImpl implements CognitoUserService {
             setUserPassword(request.getEmail(), request.getPassword());
 
             return createUserResult.getUser();
-
         } catch (com.amazonaws.services.cognitoidp.model.UsernameExistsException e) {
             throw new UsernameExistsException("User name that already exists");
         } catch (com.amazonaws.services.cognitoidp.model.InvalidPasswordException e) {
@@ -125,7 +124,6 @@ public class CognitoUserServiceImpl implements CognitoUserService {
 
     @Override
     public AdminSetUserPasswordResult setUserPassword(String username, String password) {
-
         try {
             AdminSetUserPasswordRequest adminSetUserPasswordRequest = new AdminSetUserPasswordRequest()
                     .withUsername(username)
@@ -141,12 +139,12 @@ public class CognitoUserServiceImpl implements CognitoUserService {
 
 
     @Override
-    public Optional<AdminInitiateAuthResult> initiateAuth(String username, String password) {
+    public Optional<AdminInitiateAuthResult> initiateAuth(String email, String password) {
 
         final Map<String, String> authParams = new HashMap<>();
-        authParams.put(CognitoAttributesEnum.USERNAME.name(), username);
+        authParams.put(CognitoAttributesEnum.USERNAME.name(), email);
         authParams.put(CognitoAttributesEnum.PASSWORD.name(), password);
-        authParams.put(CognitoAttributesEnum.SECRET_HASH.name(), calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), username));
+        authParams.put(CognitoAttributesEnum.SECRET_HASH.name(), calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), email));
 
 
         final AdminInitiateAuthRequest authRequest = new AdminInitiateAuthRequest()
@@ -155,7 +153,14 @@ public class CognitoUserServiceImpl implements CognitoUserService {
                 .withUserPoolId(awsConfig.getCognito().getUserPoolId())
                 .withAuthParameters(authParams);
 
-        return adminInitiateAuthResult(authRequest);
+        try {
+            return Optional.of(awsCognitoIdentityProvider.adminInitiateAuth(authRequest));
+        } catch (NotAuthorizedException e) {
+            throw new FailedAuthenticationException(String.format("Authenticate failed: %s", e.getErrorMessage()), e);
+        } catch (UserNotFoundException e) {
+            String username = authRequest.getAuthParameters().get(CognitoAttributesEnum.USERNAME.name());
+            throw new io.openfuture.openmessanger.exception.UserNotFoundException(String.format("Username %s  not found.", username), e);
+        }
     }
 
     @Override
@@ -208,7 +213,6 @@ public class CognitoUserServiceImpl implements CognitoUserService {
     @Override
     public AdminListUserAuthEventsResult getUserAuthEvents(String username, int maxResult, String nextToken) {
         try {
-
             AdminListUserAuthEventsRequest userAuthEventsRequest = new AdminListUserAuthEventsRequest();
             userAuthEventsRequest.setUsername(username);
             userAuthEventsRequest.setUserPoolId(awsConfig.getCognito().getUserPoolId());
@@ -256,17 +260,6 @@ public class CognitoUserServiceImpl implements CognitoUserService {
         }
     }
 
-    private Optional<AdminInitiateAuthResult> adminInitiateAuthResult(AdminInitiateAuthRequest request) {
-        try {
-            return Optional.of(awsCognitoIdentityProvider.adminInitiateAuth(request));
-        } catch (NotAuthorizedException e) {
-            throw new FailedAuthenticationException(String.format("Authenticate failed: %s", e.getErrorMessage()), e);
-        } catch (UserNotFoundException e) {
-            String username = request.getAuthParameters().get(CognitoAttributesEnum.USERNAME.name());
-            throw new io.openfuture.openmessanger.exception.UserNotFoundException(String.format("Username %s  not found.", username), e);
-        }
-    }
-
     private String calculateSecretHash(String userPoolClientId, String userPoolClientSecret, String userName) {
         final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
 
@@ -285,6 +278,9 @@ public class CognitoUserServiceImpl implements CognitoUserService {
     }
 
     private boolean validatePassword(final String password) {
+        if (StringUtils.hasText(password) && password.length() > 5) {
+            return false;
+        }
         String regExpn = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
 
         Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);

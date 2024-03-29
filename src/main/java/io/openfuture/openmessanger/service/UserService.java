@@ -4,7 +4,6 @@ import javax.validation.constraints.NotNull;
 
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
-import com.amazonaws.services.cognitoidp.model.UserType;
 
 import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
@@ -26,7 +25,7 @@ public interface UserService {
 
     ForgotPasswordResult userForgotPassword(String username);
 
-    UserType createUser(UserSignUpRequest signUpDTO);
+    void createUser(UserSignUpRequest signUpDTO);
 
     AdminListUserAuthEventsResult userAuthEvents(String username, int maxResult, String nextToken);
 

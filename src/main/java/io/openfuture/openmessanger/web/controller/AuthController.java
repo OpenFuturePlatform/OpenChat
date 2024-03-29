@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
-import com.amazonaws.services.cognitoidp.model.UserType;
 
 import io.openfuture.openmessanger.service.UserService;
 import io.openfuture.openmessanger.service.dto.LoginRequest;
@@ -45,7 +45,7 @@ public class AuthController {
 
     @PostMapping(value = "/signup")
     public SignUpResponse signUp(@RequestBody @Validated UserSignUpRequest signUpDTO) {
-        UserType result = userService.createUser(signUpDTO);
+        userService.createUser(signUpDTO);
         return new SignUpResponse("User account created successfully", new SignUpResponse.Data(signUpDTO.getEmail(),
                                                                                                signUpDTO.getFirstName(),
                                                                                                signUpDTO.getLastName()));
@@ -58,8 +58,8 @@ public class AuthController {
     }
 
     @GetMapping("/current")
-    public ResponseEntity<BaseResponse> current() {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<String> current(@AuthenticationPrincipal String username) {
+        return new ResponseEntity<>(username, HttpStatus.OK);
     }
 
     @GetMapping("/user")

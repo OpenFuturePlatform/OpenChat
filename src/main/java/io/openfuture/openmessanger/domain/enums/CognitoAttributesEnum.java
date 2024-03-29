@@ -18,7 +18,6 @@ public enum CognitoAttributesEnum {
 
     }
 
-
     public String getValues() {
         return values;
     }
