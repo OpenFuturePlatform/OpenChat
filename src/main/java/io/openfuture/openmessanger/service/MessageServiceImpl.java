@@ -1,5 +1,9 @@
 package io.openfuture.openmessanger.service;
 
+import java.sql.Types;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -25,10 +29,23 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public void sendMessage(final MessageRequest request) {
-        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), ZonedDateTime.now());
+        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), LocalDateTime.now());
 
         messageRepository.save(message);
         messagingTemplate.convertAndSendToUser(request.getRecipient(), "/direct", message);
+    }
+
+    @Override
+    public MessageResponse save(MessageRequest request) {
+        log.info("POST REQUEST {}", request);
+
+        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), LocalDateTime.now());
+        messageRepository.save(message);
+        return new MessageResponse(message.getId(),
+                message.getSender(),
+                message.getRecipient(),
+                message.getBody(),
+                message.getReceivedAt());
     }
 
     @Override
@@ -50,6 +67,7 @@ public class MessageServiceImpl implements MessageService {
                               .map(message -> new MessageResponse(message.getId(),
                                                                   message.getSender(),
                                                                   message.getRecipient(),
+                                                                  message.getBody(),
                                                                   message.getReceivedAt()))
                               .toList();
     }

@@ -18,6 +18,7 @@ public class ChatController {
 
     @MessageMapping("/direct-message")
     public void sendMessage(@Payload MessageRequest request) {
+        log.info("REQUEST {}", request);
         messageService.sendMessage(request);
     }
 

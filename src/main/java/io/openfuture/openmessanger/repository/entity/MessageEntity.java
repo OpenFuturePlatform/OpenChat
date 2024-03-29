@@ -1,5 +1,7 @@
 package io.openfuture.openmessanger.repository.entity;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 import lombok.AllArgsConstructor;
@@ -14,12 +16,12 @@ public class MessageEntity {
     String body;
     String sender;
     String recipient;
-    ZonedDateTime receivedAt;
+    LocalDateTime receivedAt;
 
     public MessageEntity(String body,
                          String sender,
                          String recipient,
-                         ZonedDateTime receivedAt) {
+                         LocalDateTime receivedAt) {
         this.body = body;
         this.sender = sender;
         this.recipient = recipient;

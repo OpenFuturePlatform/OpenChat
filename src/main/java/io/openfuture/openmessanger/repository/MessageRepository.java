@@ -1,5 +1,6 @@
 package io.openfuture.openmessanger.repository;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -68,9 +69,8 @@ public class MessageRepository {
 
     private static RowMapper<MessageEntity> selectMapper() {
         return (rs, rowNum) -> {
-            final ZonedDateTime receivedAt = rs.getTimestamp("received_at")
-                                               .toLocalDateTime()
-                                               .atZone(ZoneId.systemDefault());
+            final LocalDateTime receivedAt = rs.getTimestamp("received_at")
+                                               .toLocalDateTime();
 
             return new MessageEntity(rs.getInt("id"),
                                      rs.getString("body"),

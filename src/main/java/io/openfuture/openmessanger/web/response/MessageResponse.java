@@ -1,10 +1,11 @@
 package io.openfuture.openmessanger.web.response;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 public record MessageResponse(
         int id,
         String sender,
         String recipient,
-        ZonedDateTime receivedAt) {
+        String content,
+        LocalDateTime receivedAt) {
 }
