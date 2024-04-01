@@ -16,14 +16,17 @@ public class MessageEntity {
     String body;
     String sender;
     String recipient;
+    MessageContentType contentType;
     LocalDateTime receivedAt;
 
     public MessageEntity(String body,
                          String sender,
                          String recipient,
+                         MessageContentType contentType,
                          LocalDateTime receivedAt) {
         this.body = body;
         this.sender = sender;
+        this.contentType = contentType;
         this.recipient = recipient;
         this.receivedAt = receivedAt;
     }

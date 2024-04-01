@@ -29,7 +29,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public void sendMessage(final MessageRequest request) {
-        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), LocalDateTime.now());
+        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), request.getContentType(), LocalDateTime.now());
 
         messageRepository.save(message);
         messagingTemplate.convertAndSendToUser(request.getRecipient(), "/direct", message);
@@ -39,12 +39,13 @@ public class MessageServiceImpl implements MessageService {
     public MessageResponse save(MessageRequest request) {
         log.info("POST REQUEST {}", request);
 
-        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), LocalDateTime.now());
+        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), request.getContentType(), LocalDateTime.now());
         messageRepository.save(message);
         return new MessageResponse(message.getId(),
                 message.getSender(),
                 message.getRecipient(),
                 message.getBody(),
+                message.getContentType(),
                 message.getReceivedAt());
     }
 
@@ -68,6 +69,7 @@ public class MessageServiceImpl implements MessageService {
                                                                   message.getSender(),
                                                                   message.getRecipient(),
                                                                   message.getBody(),
+                                                                  message.getContentType(),
                                                                   message.getReceivedAt()))
                               .toList();
     }

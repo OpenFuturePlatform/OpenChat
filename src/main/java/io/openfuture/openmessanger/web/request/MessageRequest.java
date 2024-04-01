@@ -1,5 +1,6 @@
 package io.openfuture.openmessanger.web.request;
 
+import io.openfuture.openmessanger.repository.entity.MessageContentType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,5 +11,6 @@ import lombok.NoArgsConstructor;
 public class MessageRequest {
     private String sender;
     private String recipient;
+    private MessageContentType contentType;
     private String body;
 }
