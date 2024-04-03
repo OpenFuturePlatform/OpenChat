@@ -1,11 +1,12 @@
 create table message
 (
-    id          serial primary key,
+    id          bigint auto_increment primary key,
     body        text,
     sent_at     timestamp,
     received_at timestamp,
     sender      varchar(255),
-    recipient   varchar(255)
+    recipient   varchar(255),
+    content_type varchar(20)
 );
 
 create table attachment
