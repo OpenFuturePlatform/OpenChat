@@ -1,8 +1,6 @@
 package io.openfuture.openmessanger.repository.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

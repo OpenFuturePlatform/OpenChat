@@ -1,16 +1,14 @@
 package io.openfuture.openmessanger.repository;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 
-import io.openfuture.openmessanger.repository.entity.MessageContentType;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
 
+import io.openfuture.openmessanger.repository.entity.MessageContentType;
 import io.openfuture.openmessanger.repository.entity.MessageEntity;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +24,7 @@ public class MessageRepository {
                 select m.id, m.body, m.sender, m.recipient, m.received_at, m.content_type
                     from message m
                 where m.recipient = :recipient
-                order by received_at asc
+                order by received_at
                 """;
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue("recipient", recipient);
@@ -51,6 +49,21 @@ public class MessageRepository {
         return jdbcOperations.query(sql,
                                     parameterSource,
                                     selectMapper());
+    }
+
+    public List<String> findRecipientsBySender(final String sender) {
+
+        final String sql = """
+                select distinct m.recipient
+                    from message m
+                where m.sender = :sender
+                """;
+        final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("sender", sender);
+
+        return jdbcOperations.query(sql,
+                                    parameterSource,
+                                    (rs, rowNum) -> rs.getString("recipient"));
     }
 
     public void save(final MessageEntity message) {
