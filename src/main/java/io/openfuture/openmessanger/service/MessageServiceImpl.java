@@ -7,6 +7,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import io.openfuture.openmessanger.web.response.UserMessageResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +62,14 @@ public class MessageServiceImpl implements MessageService {
         final List<MessageEntity> messageEntities = messageRepository.findByRecipientAndSender(recipient, sender);
 
         return convertToMessageResponse(messageEntities);
+    }
+
+    @Override
+    public List<UserMessageResponse> getGroupRecipient(String recipient) {
+        UserMessageResponse userMessageResponse1 = new UserMessageResponse("1","Rasul", "https://gravatar.com/avatar/90f50f07004d8f08758cbf5cb1edb999?s=400&d=robohash&r=x", "Hello Me", LocalDateTime.now().minusDays(1));
+        UserMessageResponse userMessageResponse2 = new UserMessageResponse("2","Beksultan", "https://gravatar.com/avatar/a15258729953efef537cedd260da3cde?s=400&d=robohash&r=x", "Hello Mister", LocalDateTime.now().minusDays(1));
+
+        return List.of(userMessageResponse1, userMessageResponse2);
     }
 
     private List<MessageResponse> convertToMessageResponse(final List<MessageEntity> messageEntities) {

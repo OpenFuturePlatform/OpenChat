@@ -42,7 +42,7 @@ public class MessageRepository {
                 select m.id, m.body, m.sender, m.recipient, m.received_at, m.content_type
                     from message m
                 where m.recipient = :recipient and m.sender = :sender
-                order by id desc
+                order by id asc
                 """;
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue("recipient", recipient)
