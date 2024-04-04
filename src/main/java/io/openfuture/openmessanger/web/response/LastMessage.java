@@ -6,7 +6,12 @@ import lombok.Value;
 
 @Value
 public class LastMessage {
-    String preview;
-    String sender;
-    LocalDateTime sentAt;
+    String chatUid;
+    boolean group;
+    String chatRoomName;
+    Integer memberCount;
+    String displayUserName;
+    String lastMessageText;
+    LocalDateTime lastMessageTime;
+    String chatRoomPicture;
 }

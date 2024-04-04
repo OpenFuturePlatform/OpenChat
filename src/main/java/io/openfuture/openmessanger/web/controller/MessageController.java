@@ -43,7 +43,17 @@ public class MessageController {
     @GetMapping(value = "/front-messages")
     public FrontMessagesResponse getFrontMessages(@RequestParam(value = "user") String username) {
         final List<MessageResponse> messages = messageService.getLastMessagesByRecipient(username);
-        final List<LastMessage> lastMessages = messages.stream().map(m -> new LastMessage(m.content(), m.sender(), m.sentAt())).toList();
+        final List<LastMessage> lastMessages = messages.stream()
+                                                       .map(m -> new LastMessage(String.valueOf(m.id()),
+                                                                                 false,
+                                                                                 "chatRoomName",
+                                                                                 0,
+                                                                                 m.sender(),
+                                                                                 m.content(),
+                                                                                 m.sentAt(),
+                                                                                 "")
+                                                       )
+                                                       .toList();
         return new FrontMessagesResponse(lastMessages);
     }
 
