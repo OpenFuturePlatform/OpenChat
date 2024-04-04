@@ -10,4 +10,5 @@ public interface MessageService {
     MessageResponse save(MessageRequest messageRequest);
     List<MessageResponse> getAllByRecipient(String recipient);
     List<MessageResponse> getAllByRecipientAndSender(String recipient, String sender);
+    List<MessageResponse> getLastMessagesByRecipient(String recipient);
 }

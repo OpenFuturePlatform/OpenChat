@@ -1,11 +1,11 @@
 create table message
 (
-    id          bigint auto_increment primary key,
-    body        text,
-    sent_at     timestamp,
-    received_at timestamp,
-    sender      varchar(255),
-    recipient   varchar(255),
+    id           serial primary key,
+    body         text,
+    sent_at      timestamp,
+    received_at  timestamp,
+    sender       varchar(255),
+    recipient    varchar(255),
     content_type varchar(20)
 );
 
@@ -28,3 +28,30 @@ create table "user"
     avatar        varchar(255),
     active        bool default true
 );
+
+create table "group"
+(
+    id          serial primary key,
+    creator     int,
+    created_at  timestamp,
+    name        varchar(255),
+    archived    bool default false,
+    archived_at timestamp
+);
+
+create table group_message
+(
+    id           serial primary key,
+    body         text,
+    sender       varchar(255),
+    content_type varchar(20),
+    "group_id"   int,
+    sent_at      timestamp
+);
+
+create table group_participant
+(
+    participant int,
+    group_id    int,
+    deleted     bool
+)

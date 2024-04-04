@@ -29,7 +29,12 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public void sendMessage(final MessageRequest request) {
-        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), request.getContentType(), LocalDateTime.now());
+        final MessageEntity message = new MessageEntity(request.getBody(),
+                                                        request.getSender(),
+                                                        request.getRecipient(),
+                                                        request.getContentType(),
+                                                        LocalDateTime.now(),
+                                                        LocalDateTime.now());
 
         messageRepository.save(message);
         messagingTemplate.convertAndSendToUser(request.getRecipient(), "/direct", message);
@@ -39,14 +44,20 @@ public class MessageServiceImpl implements MessageService {
     public MessageResponse save(MessageRequest request) {
         log.info("POST REQUEST {}", request);
 
-        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), request.getContentType(), LocalDateTime.now());
+        final MessageEntity message = new MessageEntity(request.getBody(),
+                                                        request.getSender(),
+                                                        request.getRecipient(),
+                                                        request.getContentType(),
+                                                        LocalDateTime.now(),
+                                                        LocalDateTime.now());
         messageRepository.save(message);
         return new MessageResponse(message.getId(),
-                message.getSender(),
-                message.getRecipient(),
-                message.getBody(),
-                message.getContentType(),
-                message.getReceivedAt());
+                                   message.getSender(),
+                                   message.getRecipient(),
+                                   message.getBody(),
+                                   message.getContentType(),
+                                   message.getReceivedAt(),
+                                   message.getSentAt());
     }
 
     @Override
@@ -63,6 +74,13 @@ public class MessageServiceImpl implements MessageService {
         return convertToMessageResponse(messageEntities);
     }
 
+    @Override
+    public List<MessageResponse> getLastMessagesByRecipient(final String recipient) {
+        final List<MessageEntity> messageEntities = messageRepository.findLastMessagesByRecipient(recipient);
+
+        return convertToMessageResponse(messageEntities);
+    }
+
     private List<MessageResponse> convertToMessageResponse(final List<MessageEntity> messageEntities) {
         return messageEntities.stream()
                               .map(message -> new MessageResponse(message.getId(),
@@ -70,7 +88,8 @@ public class MessageServiceImpl implements MessageService {
                                                                   message.getRecipient(),
                                                                   message.getBody(),
                                                                   message.getContentType(),
-                                                                  message.getReceivedAt()))
+                                                                  message.getReceivedAt(),
+                                                                  message.getSentAt()))
                               .toList();
     }
 

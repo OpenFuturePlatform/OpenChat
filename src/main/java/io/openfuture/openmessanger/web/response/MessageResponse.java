@@ -1,8 +1,8 @@
 package io.openfuture.openmessanger.web.response;
 
-import io.openfuture.openmessanger.repository.entity.MessageContentType;
-
 import java.time.LocalDateTime;
+
+import io.openfuture.openmessanger.repository.entity.MessageContentType;
 
 public record MessageResponse(
         int id,
@@ -10,5 +10,6 @@ public record MessageResponse(
         String recipient,
         String content,
         MessageContentType contentType,
-        LocalDateTime receivedAt) {
+        LocalDateTime receivedAt,
+        LocalDateTime sentAt) {
 }
