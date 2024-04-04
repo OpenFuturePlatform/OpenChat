@@ -41,8 +41,8 @@ public class MessageRepository {
         final String sql = """
                 select m.id, m.body, m.sender, m.recipient, m.received_at, m.content_type
                     from message m
-                where m.recipient = :recipient and m.sender = :sender
-                order by id asc
+                where (m.recipient = :recipient and m.sender = :sender) or (m.recipient = :sender and m.sender = :recipient)
+                order by m.id asc
                 """;
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue("recipient", recipient)

@@ -66,10 +66,10 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<UserMessageResponse> getGroupRecipient(String recipient) {
-        UserMessageResponse userMessageResponse1 = new UserMessageResponse("1","Rasul", "https://gravatar.com/avatar/90f50f07004d8f08758cbf5cb1edb999?s=400&d=robohash&r=x", "Hello Me", LocalDateTime.now().minusDays(1));
-        UserMessageResponse userMessageResponse2 = new UserMessageResponse("2","Beksultan", "https://gravatar.com/avatar/a15258729953efef537cedd260da3cde?s=400&d=robohash&r=x", "Hello Mister", LocalDateTime.now().minusDays(1));
+        UserMessageResponse userMessageResponse1 = new UserMessageResponse("1","rasul", "https://gravatar.com/avatar/90f50f07004d8f08758cbf5cb1edb999?s=400&d=robohash&r=x", "Hello Me", LocalDateTime.now().minusDays(1));
+        //UserMessageResponse userMessageResponse2 = new UserMessageResponse("2","beksultan", "https://gravatar.com/avatar/a15258729953efef537cedd260da3cde?s=400&d=robohash&r=x", "Hello Mister", LocalDateTime.now().minusDays(1));
 
-        return List.of(userMessageResponse1, userMessageResponse2);
+        return List.of(userMessageResponse1);
     }
 
     private List<MessageResponse> convertToMessageResponse(final List<MessageEntity> messageEntities) {
