@@ -42,25 +42,30 @@ public class MessageRepository {
                                     selectMapper());
     }
 
-    public List<MessageEntity> findLastMessagesByRecipient(final String recipient) {
+    public List<MessageEntity> findLastMessagesByUsername(final String username) {
 
         final String sql = """
                 with ordered as (select id,
+                                        private_chat_id,
                                         body,
-                                        sender,
-                                        recipient,
                                         sent_at,
                                         received_at,
+                                        sent_at,
+                                        sender,
+                                        recipient,
                                         content_type,
-                                        row_number() over (partition by sender order by sent_at desc) as row_n
-                                 from message)
-                select *
-                from ordered
-                where recipient = :recipient
-                  and row_n = 1;
+                                        row_number() over (partition by private_chat_id order by sent_at desc ) last_message
+                                 from message mes
+                                 where mes.private_chat_id in (select pc.id
+                                                               from private_chat pc
+                                                                        join chat_participant cp on pc.id = cp.chat_id
+                                                               where cp."user" = :user))
+                                select *
+                                from ordered
+                                where last_message = 1
                 """;
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue("recipient", recipient);
+                .addValue("user", username);
 
         return jdbcOperations.query(sql,
                                     parameterSource,

@@ -44,7 +44,7 @@ public class MessageController {
     public FrontMessagesResponse getFrontMessages(@RequestParam(value = "user") String username) {
         final List<MessageResponse> messages = messageService.getLastMessagesByRecipient(username);
         final List<LastMessage> lastMessages = messages.stream()
-                                                       .map(m -> new LastMessage(String.valueOf(m.id()),
+                                                       .map(m -> new LastMessage(String.valueOf(m.privateChatId()),
                                                                                  false,
                                                                                  "chatRoomName",
                                                                                  0,

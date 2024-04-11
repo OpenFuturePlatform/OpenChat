@@ -104,7 +104,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<MessageResponse> getLastMessagesByRecipient(final String recipient) {
-        final List<MessageEntity> messageEntities = messageRepository.findLastMessagesByRecipient(recipient);
+        final List<MessageEntity> messageEntities = messageRepository.findLastMessagesByUsername(recipient);
         return convertToMessageResponse(messageEntities);
     }
 
