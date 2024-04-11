@@ -23,4 +23,8 @@ public class UserController {
         return userService.getAllRecipientsBySender(senderUsername);
     }
 
+    @GetMapping("/all")
+    public Collection<User> getAllRegisteredUsers() {
+        return userService.getAllUsers();
+    }
 }

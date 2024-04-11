@@ -23,4 +23,10 @@ public class UserServiceImpl implements UserService {
         final List<String> recipients = messageRepository.findRecipientsBySender(username);
         return recipients.stream().map(userJpaRepository::findByEmail).toList();
     }
+
+    @Override
+    public Collection<User> getAllUsers() {
+        return userJpaRepository.findAll();
+    }
+
 }
