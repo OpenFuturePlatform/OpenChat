@@ -11,5 +11,6 @@ public record MessageResponse(
         String content,
         MessageContentType contentType,
         LocalDateTime receivedAt,
-        LocalDateTime sentAt) {
+        LocalDateTime sentAt,
+        Integer privateChatId) {
 }

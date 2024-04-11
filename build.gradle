@@ -44,6 +44,7 @@ dependencies {
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.687'
     implementation("javax.validation:validation-api:2.0.1.Final")
 
+    implementation 'com.amazonaws:aws-java-sdk-qconnect:1.12.693'
 
     implementation("org.passay:passay:1.6.3")
     compileOnly 'org.projectlombok:lombok'

@@ -21,7 +21,15 @@ public class MessageRepository {
     public List<MessageEntity> findByRecipient(final String recipient) {
 
         final String sql = """
-                select m.id, m.body, m.sender, m.recipient, m.received_at, m.content_type, m.sent_at
+                select
+                m.id,
+                m.private_chat_id,
+                m.body,
+                m.sender,
+                m.recipient,
+                m.received_at,
+                m.content_type,
+                m.sent_at
                     from message m
                 where m.recipient = :recipient
                 order by received_at
@@ -62,7 +70,15 @@ public class MessageRepository {
     public List<MessageEntity> findByRecipientAndSender(final String recipient, final String sender) {
 
         final String sql = """
-                select m.id, m.body, m.sender, m.recipient, m.received_at, m.sent_at, m.content_type
+                select
+                m.id,
+                m.private_chat_id,
+                m.body,
+                m.sender,
+                m.recipient,
+                m.received_at,
+                m.sent_at,
+                m.content_type
                     from message m
                 where m.recipient = :recipient and m.sender = :sender
                 order by id desc
@@ -93,11 +109,12 @@ public class MessageRepository {
 
     public void save(final MessageEntity message) {
         final String sql = """
-                INSERT INTO message(body, content_type, sender, recipient, received_at)
-                VALUES (:body, :content_type, :sender, :recipient, :receivedAt)
+                INSERT INTO message(private_chat_id, body, content_type, sender, recipient, received_at)
+                VALUES (:privateChatId, :body, :content_type, :sender, :recipient, :receivedAt)
                 """;
 
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("privateChatId", message.getPrivateChatId())
                 .addValue("body", message.getBody())
                 .addValue("sender", message.getSender())
                 .addValue("recipient", message.getRecipient())
@@ -120,7 +137,8 @@ public class MessageRepository {
                                      rs.getString("recipient"),
                                      MessageContentType.valueOf(rs.getString("content_type")),
                                      receivedAt,
-                                     sentAt);
+                                     sentAt,
+                                     rs.getInt("private_chat_id"));
         };
     }
 

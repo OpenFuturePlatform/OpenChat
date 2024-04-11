@@ -17,18 +17,21 @@ public class MessageEntity {
     MessageContentType contentType;
     LocalDateTime receivedAt;
     LocalDateTime sentAt;
+    Integer privateChatId;
 
-    public MessageEntity(String body,
-                         String sender,
-                         String recipient,
-                         MessageContentType contentType,
-                         LocalDateTime receivedAt,
-                         LocalDateTime sentAt) {
+    public MessageEntity(final String body,
+                         final String sender,
+                         final String recipient,
+                         final MessageContentType contentType,
+                         final LocalDateTime receivedAt,
+                         final LocalDateTime sentAt,
+                         final Integer privateChatId) {
         this.body = body;
         this.sender = sender;
-        this.contentType = contentType;
         this.recipient = recipient;
+        this.contentType = contentType;
         this.receivedAt = receivedAt;
         this.sentAt = sentAt;
+        this.privateChatId = privateChatId;
     }
 }
