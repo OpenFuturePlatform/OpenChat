@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
 
-import io.openfuture.openmessanger.service.UserService;
+import io.openfuture.openmessanger.service.UserAuthService;
 import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
 import io.openfuture.openmessanger.service.dto.UserPasswordUpdateRequest;
@@ -37,15 +37,15 @@ import io.openfuture.openmessanger.web.response.BaseResponse;
 @RequestMapping("/api/v1/public")
 public class AuthController {
 
-    private final UserService userService;
+    private final UserAuthService userAuthService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
+    public AuthController(UserAuthService userAuthService) {
+        this.userAuthService = userAuthService;
     }
 
     @PostMapping(value = "/signup")
     public SignUpResponse signUp(@RequestBody @Validated UserSignUpRequest signUpDTO) {
-        userService.createUser(signUpDTO);
+        userAuthService.createUser(signUpDTO);
         return new SignUpResponse("User account created successfully", new SignUpResponse.Data(signUpDTO.getEmail(),
                                                                                                signUpDTO.getFirstName(),
                                                                                                signUpDTO.getLastName()));
@@ -53,7 +53,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody @Validated LoginRequest loginRequest) {
-        final AuthenticatedResponse authenticate = userService.authenticate(loginRequest);
+        final AuthenticatedResponse authenticate = userAuthService.authenticate(loginRequest);
         return new LoginResponse(authenticate.getAccessToken(), "User logged in Successfully", authenticate.getRefreshToken());
     }
 
@@ -65,17 +65,17 @@ public class AuthController {
     @GetMapping("/user")
     public UserResponse getUserDetails(@RequestHeader("Authorization") String bearerToken) {
         String accessToken = bearerToken.replace("Bearer ", "");
-        return userService.getCurrent(accessToken);
+        return userAuthService.getCurrent(accessToken);
     }
 
     @PostMapping("/login-sms-verify")
     public ResponseEntity<AuthenticatedResponse> loginSmsVerify(@RequestBody @Validated LoginSmsVerifyRequest loginSmsVerifyRequest) {
-        return new ResponseEntity<>(userService.authenticateSms(loginSmsVerifyRequest), HttpStatus.OK);
+        return new ResponseEntity<>(userAuthService.authenticateSms(loginSmsVerifyRequest), HttpStatus.OK);
     }
 
     @PutMapping("/change-password")
     public ResponseEntity<BaseResponse> changePassword(@RequestBody @Validated UserPasswordUpdateRequest userPasswordUpdateRequest) {
-        AuthenticatedResponse authenticatedResponse = userService.updateUserPassword(userPasswordUpdateRequest);
+        AuthenticatedResponse authenticatedResponse = userAuthService.updateUserPassword(userPasswordUpdateRequest);
 
         return new ResponseEntity<>(new BaseResponse(authenticatedResponse, "Update successfully", false), HttpStatus.OK);
     }
@@ -85,7 +85,7 @@ public class AuthController {
         if (bearerToken != null && bearerToken.contains("Bearer ")) {
             String accessToken = bearerToken.replace("Bearer ", "");
 
-            userService.logout(accessToken);
+            userAuthService.logout(accessToken);
 
             return new ResponseEntity<>(new BaseResponse(null, "Logout successfully", false), HttpStatus.OK);
         }
@@ -94,7 +94,7 @@ public class AuthController {
 
     @GetMapping(value = "/forget-password")
     public ResponseEntity<BaseResponse> forgotPassword(@NotNull @NotEmpty @Email @RequestParam("email") String email) {
-        ForgotPasswordResult result = userService.userForgotPassword(email);
+        ForgotPasswordResult result = userAuthService.userForgotPassword(email);
         return new ResponseEntity<>(new BaseResponse(
                 result.getCodeDeliveryDetails().getDestination(),
                 "You should soon receive an email which will allow you to reset your password. Check your spam and trash if you can't find the email.", false), HttpStatus.OK);
@@ -106,7 +106,7 @@ public class AuthController {
             @RequestParam(value = "maxResult", defaultValue = "0") int maxResult,
             @RequestParam(value = "nextToken", required = false) String nextToken) {
 
-        AdminListUserAuthEventsResult result = userService.userAuthEvents(username, maxResult, nextToken);
+        AdminListUserAuthEventsResult result = userAuthService.userAuthEvents(username, maxResult, nextToken);
         return new ResponseEntity<>(new BaseResponse(
                 result, "user data", false), HttpStatus.OK);
     }

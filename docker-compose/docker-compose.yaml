@@ -25,6 +25,18 @@ services:
     volumes:
       - local-mysql-data:/var/lib/mysql
 
+  open-chat-postgres:
+    container_name: open-chat-postgres
+    image: postgres
+    environment:
+      POSTGRES_DB: open_chat
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    volumes:
+      - local-postgres-data:/var/lib/postgres
+    ports:
+      - "5434:5432"
 volumes:
   rabbitmq-data:
   local-mysql-data:
+  local-postgres-data:

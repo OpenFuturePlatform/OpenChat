@@ -1,19 +1,19 @@
 package io.openfuture.openmessanger.service;
 
-import java.sql.Types;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
-import io.openfuture.openmessanger.web.response.UserMessageResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.openfuture.openmessanger.repository.ChatParticipantRepository;
 import io.openfuture.openmessanger.repository.MessageRepository;
+import io.openfuture.openmessanger.repository.PrivateChatRepository;
+import io.openfuture.openmessanger.repository.entity.ChatParticipant;
 import io.openfuture.openmessanger.repository.entity.MessageEntity;
+import io.openfuture.openmessanger.repository.entity.PrivateChat;
 import io.openfuture.openmessanger.web.request.MessageRequest;
 import io.openfuture.openmessanger.web.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,28 +26,66 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
+    private final PrivateChatRepository privateChatRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final ChatParticipantRepository chatParticipantRepository;
 
     @Override
     public void sendMessage(final MessageRequest request) {
-        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), request.getContentType(), LocalDateTime.now());
+        final PrivateChat privateChat = getPrivateChat(request);
+        final MessageEntity message = new MessageEntity(request.getBody(),
+                                                        request.getSender(),
+                                                        request.getRecipient(),
+                                                        request.getContentType(),
+                                                        LocalDateTime.now(),
+                                                        LocalDateTime.now(),
+                                                        privateChat.getId());
 
         messageRepository.save(message);
         messagingTemplate.convertAndSendToUser(request.getRecipient(), "/direct", message);
+    }
+
+    private PrivateChat getPrivateChat(final MessageRequest request) {
+        final Optional<PrivateChat> privateChat = privateChatRepository.findPrivateChatByParticipants(request.getSender(), request.getSender());
+
+        if (privateChat.isPresent()) {
+            return privateChat.get();
+        }
+
+        final PrivateChat newPrivateChat = privateChatRepository.save(new PrivateChat());
+
+        final ChatParticipant sender = new ChatParticipant(newPrivateChat.getId(), request.getSender());
+        final ChatParticipant recipient = new ChatParticipant(newPrivateChat.getId(), request.getRecipient());
+
+        chatParticipantRepository.save(sender);
+        chatParticipantRepository.save(recipient);
+
+        newPrivateChat.setChatParticipants(List.of(sender, recipient));
+        return newPrivateChat;
     }
 
     @Override
     public MessageResponse save(MessageRequest request) {
         log.info("POST REQUEST {}", request);
 
-        final MessageEntity message = new MessageEntity(request.getBody(), request.getSender(), request.getRecipient(), request.getContentType(), LocalDateTime.now());
+        final PrivateChat privateChat = getPrivateChat(request);
+
+        final MessageEntity message = new MessageEntity(request.getBody(),
+                                                        request.getSender(),
+                                                        request.getRecipient(),
+                                                        request.getContentType(),
+                                                        LocalDateTime.now(),
+                                                        LocalDateTime.now(),
+                                                        privateChat.getId());
         messageRepository.save(message);
         return new MessageResponse(message.getId(),
-                message.getSender(),
-                message.getRecipient(),
-                message.getBody(),
-                message.getContentType(),
-                message.getReceivedAt());
+                                   message.getSender(),
+                                   message.getRecipient(),
+                                   message.getBody(),
+                                   message.getContentType(),
+                                   message.getReceivedAt(),
+                                   message.getSentAt(),
+                                   message.getPrivateChatId());
     }
 
     @Override
@@ -65,11 +103,9 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<UserMessageResponse> getGroupRecipient(String recipient) {
-        UserMessageResponse userMessageResponse1 = new UserMessageResponse("1","rasul", "https://gravatar.com/avatar/90f50f07004d8f08758cbf5cb1edb999?s=400&d=robohash&r=x", "Hello Me", LocalDateTime.now().minusDays(1));
-        //UserMessageResponse userMessageResponse2 = new UserMessageResponse("2","beksultan", "https://gravatar.com/avatar/a15258729953efef537cedd260da3cde?s=400&d=robohash&r=x", "Hello Mister", LocalDateTime.now().minusDays(1));
-
-        return List.of(userMessageResponse1);
+    public List<MessageResponse> getLastMessagesByRecipient(final String recipient) {
+        final List<MessageEntity> messageEntities = messageRepository.findLastMessagesByUsername(recipient);
+        return convertToMessageResponse(messageEntities);
     }
 
     private List<MessageResponse> convertToMessageResponse(final List<MessageEntity> messageEntities) {
@@ -79,7 +115,9 @@ public class MessageServiceImpl implements MessageService {
                                                                   message.getRecipient(),
                                                                   message.getBody(),
                                                                   message.getContentType(),
-                                                                  message.getReceivedAt()))
+                                                                  message.getReceivedAt(),
+                                                                  message.getSentAt(),
+                                                                  message.getPrivateChatId()))
                               .toList();
     }
 
