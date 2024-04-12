@@ -13,7 +13,7 @@ import io.openfuture.openmessanger.web.request.group.AddParticipantsRequest;
 import io.openfuture.openmessanger.web.request.group.CreateGroupRequest;
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/api/v1/grops")
+@RequestMapping("/api/v1/groups")
 @RestController
 @RequiredArgsConstructor
 public class GroupChatController {
