@@ -25,7 +25,7 @@ public class GroupChatController {
         groupChatService.create(request);
     }
 
-    @PutMapping()
+    @PutMapping
     public void addParticipants(@RequestBody AddParticipantsRequest request) {
         groupChatService.addParticipants(request);
     }
@@ -35,7 +35,7 @@ public class GroupChatController {
         groupChatService.archive(groupId);
     }
 
-    @PostMapping
+    @PostMapping("leave")
     public void leaveGroup() {
         groupChatService.leave();
     }
