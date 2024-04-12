@@ -1,5 +1,7 @@
 package io.openfuture.openmessanger.repository.entity;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -12,18 +14,18 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "group")
-public class Group {
+@Table(name = "group_chat")
+public class GroupChat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "creator")
-    private Integer creator;
+    private String creator;
 
     @Column(name = "created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "name", length = 255)
     private String name;
@@ -32,7 +34,17 @@ public class Group {
     private boolean archived = false;
 
     @Column(name = "archived_at")
-    private Date archivedAt;
+    private LocalDateTime archivedAt;
+
+    public GroupChat(final String creator, final LocalDateTime createdAt, final String name) {
+        this.creator = creator;
+        this.createdAt = createdAt;
+        this.name = name;
+    }
+
+    public GroupChat(final Integer id) {
+        this.id = id;
+    }
 
 }
 
