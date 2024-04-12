@@ -2,6 +2,7 @@ create table message
 (
     id              serial primary key,
     private_chat_id integer,
+    group_chat_id   integer,
     body            text,
     sent_at         timestamp,
     received_at     timestamp,
@@ -31,7 +32,7 @@ create table attachment
     created_at timestamp
 );
 
-create table "user"
+create table open_user
 (
     id            serial primary key,
     email         varchar(255),
@@ -44,29 +45,20 @@ create table "user"
     active        bool default true
 );
 
-create table "group"
+create table group_chat
 (
     id          serial primary key,
-    creator     int,
+    creator     varchar(255),
     created_at  timestamp,
     name        varchar(255),
     archived    bool default false,
     archived_at timestamp
 );
 
-create table group_message
-(
-    id           serial primary key,
-    body         text,
-    sender       varchar(255),
-    content_type varchar(20),
-    "group_id"   int,
-    sent_at      timestamp
-);
-
 create table group_participant
 (
-    participant int,
+    id          serial primary key,
+    participant varchar(255),
     group_id    int,
     deleted     bool
 )

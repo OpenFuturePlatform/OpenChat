@@ -2,15 +2,12 @@ spring:
   application:
     name: open-chat
   datasource:
-    username: root
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5434/open_chat
+    username: postgres
     password: 123456
-    url: jdbc:mysql://localhost:3310/open_chat?useSSL=false&characterEncoding=utf-8&allowPublicKeyRetrieval=true
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: ${spring.datasource.hikari.maximum-pool-size}
   jpa:
-    hibernate:
-      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 aws:
   access-key: AKIAUSWCDIFRDTGV52OL
