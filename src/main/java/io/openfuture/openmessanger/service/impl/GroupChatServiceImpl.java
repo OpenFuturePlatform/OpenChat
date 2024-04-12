@@ -2,9 +2,7 @@ package io.openfuture.openmessanger.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -57,7 +55,9 @@ public class GroupChatServiceImpl implements GroupChatService {
 
     @Override
     public void leave() {
-
+        groupParticipantRepository.findAllByParticipantAndGroupChat_Id("", 1).ifPresent(
+                groupParticipant -> groupParticipant.setDeleted(true)
+        );
     }
 
     private boolean hasInGroup(final List<GroupParticipant> groupParticipants, final String username) {
