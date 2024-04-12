@@ -32,6 +32,7 @@ public class GroupChatServiceImpl implements GroupChatService {
 
     @Override
     public void addParticipants(final AddParticipantsRequest request) {
+        //add check to get users from database as well
         final List<GroupParticipant> existingInGroup = request.getUsers().stream().map(username -> groupParticipantRepository.findAllByParticipantAndGroupChat_Id(
                 username, request.getGroupId()
         )).filter(Optional::isPresent).map(Optional::get).toList();
@@ -47,7 +48,11 @@ public class GroupChatServiceImpl implements GroupChatService {
 
     @Override
     public void archive(final Integer groupId) {
-
+        final Optional<GroupChat> group = groupChatRepository.findById(groupId);
+        group.ifPresent(groupChat -> {
+            groupChat.setArchived(true);
+            groupChat.setArchivedAt(LocalDateTime.now());
+        });
     }
 
     @Override
