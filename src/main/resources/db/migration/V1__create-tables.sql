@@ -31,7 +31,7 @@ create table attachment
     created_at timestamp
 );
 
-create table "user"
+create table "open_user"
 (
     id            serial primary key,
     email         varchar(255),
