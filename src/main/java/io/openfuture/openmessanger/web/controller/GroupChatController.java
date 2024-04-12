@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.openfuture.openmessanger.repository.entity.GroupChat;
 import io.openfuture.openmessanger.service.GroupChatService;
 import io.openfuture.openmessanger.web.request.group.AddParticipantsRequest;
 import io.openfuture.openmessanger.web.request.group.CreateGroupRequest;
@@ -21,8 +22,8 @@ public class GroupChatController {
     private final GroupChatService groupChatService;
 
     @PostMapping
-    public void create(@RequestBody CreateGroupRequest request) {
-        groupChatService.create(request);
+    public GroupChat create(@RequestBody CreateGroupRequest request) {
+        return groupChatService.create(request);
     }
 
     @PutMapping
