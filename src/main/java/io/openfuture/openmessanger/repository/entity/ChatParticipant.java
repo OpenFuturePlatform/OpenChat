@@ -23,11 +23,11 @@ public class ChatParticipant {
 
     private Integer chatId;
 
-    private String user;
+    private String username;
 
-    public ChatParticipant(final Integer chatId, final String user) {
+    public ChatParticipant(final Integer chatId, final String username) {
         this.chatId = chatId;
-        this.user = user;
+        this.username = username;
     }
 
 }

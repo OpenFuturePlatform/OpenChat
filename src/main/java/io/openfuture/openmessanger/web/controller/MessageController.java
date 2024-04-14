@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.openfuture.openmessanger.service.MessageService;
+import io.openfuture.openmessanger.web.request.GroupMessageRequest;
 import io.openfuture.openmessanger.web.request.MessageRequest;
 import io.openfuture.openmessanger.web.response.FrontMessagesResponse;
+import io.openfuture.openmessanger.web.response.GroupMessageResponse;
 import io.openfuture.openmessanger.web.response.LastMessage;
 import io.openfuture.openmessanger.web.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,11 @@ public class MessageController {
     @PostMapping
     public MessageResponse save(@RequestBody MessageRequest messageRequest) {
         return messageService.save(messageRequest);
+    }
+
+    @PostMapping("/group")
+    public GroupMessageResponse saveToGroup(@RequestBody GroupMessageRequest request) {
+        return messageService.saveToGroup(request);
     }
 
     @GetMapping(value = "/recipient/{recipient}/from/{sender}")
@@ -56,5 +63,8 @@ public class MessageController {
                                                        .toList();
         return new FrontMessagesResponse(lastMessages);
     }
+
+    //TODO: Load messages by conversations id (chatUid), GET
+
 
 }

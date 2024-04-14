@@ -39,7 +39,7 @@ public class MessageRepository {
 
         return jdbcOperations.query(sql,
                                     parameterSource,
-                                    selectMapper());
+                                    privateMessageSelectMapper());
     }
 
     public List<MessageEntity> findLastMessagesByUsername(final String username) {
@@ -59,7 +59,7 @@ public class MessageRepository {
                                  where mes.private_chat_id in (select pc.id
                                                                from private_chat pc
                                                                         join chat_participant cp on pc.id = cp.chat_id
-                                                               where cp."user" = :user))
+                                                               where cp."username" = :user))
                                 select *
                                 from ordered
                                 where last_message = 1
@@ -69,7 +69,7 @@ public class MessageRepository {
 
         return jdbcOperations.query(sql,
                                     parameterSource,
-                                    selectMapper());
+                                    privateMessageSelectMapper());
     }
 
     public List<MessageEntity> findByRecipientAndSender(final String recipient, final String sender) {
@@ -94,7 +94,7 @@ public class MessageRepository {
 
         return jdbcOperations.query(sql,
                                     parameterSource,
-                                    selectMapper());
+                                    privateMessageSelectMapper());
     }
 
     public List<String> findRecipientsBySender(final String sender) {
@@ -114,8 +114,8 @@ public class MessageRepository {
 
     public void save(final MessageEntity message) {
         final String sql = """
-                INSERT INTO message(private_chat_id, body, content_type, sender, recipient, received_at)
-                VALUES (:privateChatId, :body, :content_type, :sender, :recipient, :receivedAt)
+                INSERT INTO message(private_chat_id, body, content_type, sender, recipient, received_at, sent_at)
+                VALUES (:privateChatId, :body, :content_type, :sender, :recipient, :receivedAt, :sentAt)
                 """;
 
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
@@ -124,12 +124,13 @@ public class MessageRepository {
                 .addValue("sender", message.getSender())
                 .addValue("recipient", message.getRecipient())
                 .addValue("content_type", message.getContentType().name())
-                .addValue("receivedAt", message.getReceivedAt());
+                .addValue("receivedAt", message.getReceivedAt())
+                .addValue("sentAt", message.getSentAt());
 
         jdbcOperations.update(sql, parameterSource);
     }
 
-    private static RowMapper<MessageEntity> selectMapper() {
+    private static RowMapper<MessageEntity> privateMessageSelectMapper() {
         return (rs, rowNum) -> {
             final LocalDateTime receivedAt = rs.getTimestamp("received_at")
                                                .toLocalDateTime();
@@ -144,6 +145,20 @@ public class MessageRepository {
                                      receivedAt,
                                      sentAt,
                                      rs.getInt("private_chat_id"));
+        };
+    }
+
+    private static RowMapper<MessageEntity> groupMessageSelectMapper() {
+        return (rs, rowNum) -> {
+            final LocalDateTime sentAt = rs.getTimestamp("sent_at")
+                                               .toLocalDateTime();
+
+            return new MessageEntity(rs.getInt("id"),
+                                     rs.getString("body"),
+                                     rs.getString("sender"),
+                                     MessageContentType.valueOf(rs.getString("content_type")),
+                                     sentAt,
+                                     rs.getInt("group_chat_id"));
         };
     }
 
