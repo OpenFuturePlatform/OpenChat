@@ -48,10 +48,10 @@ public class MessageController {
     }
 
     @GetMapping(value = "/front-messages")
-    public FrontMessagesResponse getFrontMessages(@RequestParam(value = "user") String username) {
+    public List<LastMessage> getFrontMessages(@RequestParam(value = "user") String username) {
         final List<MessageResponse> messages = messageService.getLastMessagesByRecipient(username);
-        final List<LastMessage> lastMessages = messages.stream()
-                                                       .map(m -> new LastMessage(String.valueOf(m.privateChatId()),
+        return messages.stream()
+                       .map(m -> new LastMessage(String.valueOf(m.privateChatId()),
                                                                                  false,
                                                                                  "chatRoomName",
                                                                                  0,
@@ -60,8 +60,7 @@ public class MessageController {
                                                                                  m.sentAt(),
                                                                                  "")
                                                        )
-                                                       .toList();
-        return new FrontMessagesResponse(lastMessages);
+                       .toList();
     }
 
     //TODO: Load messages by conversations id (chatUid), GET
