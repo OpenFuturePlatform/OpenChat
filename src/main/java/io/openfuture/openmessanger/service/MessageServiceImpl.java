@@ -48,7 +48,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private PrivateChat getPrivateChat(final MessageRequest request) {
-        final Optional<PrivateChat> privateChat = privateChatRepository.findPrivateChatByParticipants(request.getSender(), request.getSender());
+        final Optional<PrivateChat> privateChat = privateChatRepository.findPrivateChatByParticipants(request.getSender(), request.getRecipient());
 
         if (privateChat.isPresent()) {
             return privateChat.get();

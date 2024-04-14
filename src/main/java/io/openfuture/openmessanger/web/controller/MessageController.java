@@ -64,4 +64,7 @@ public class MessageController {
         return new FrontMessagesResponse(lastMessages);
     }
 
+    //TODO: Load messages by conversations id (chatUid), GET
+
+
 }
