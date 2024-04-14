@@ -18,7 +18,25 @@ public class MessageEntity {
     LocalDateTime receivedAt;
     LocalDateTime sentAt;
     Integer privateChatId;
+    Integer groupChatId;
 
+    public MessageEntity(final int id,
+                         final String body,
+                         final String sender,
+                         final String recipient,
+                         final MessageContentType contentType,
+                         final LocalDateTime receivedAt,
+                         final LocalDateTime sentAt,
+                         final Integer privateChatId) {
+        this.id = id;
+        this.body = body;
+        this.sender = sender;
+        this.recipient = recipient;
+        this.contentType = contentType;
+        this.receivedAt = receivedAt;
+        this.sentAt = sentAt;
+        this.privateChatId = privateChatId;
+    }
     public MessageEntity(final String body,
                          final String sender,
                          final String recipient,
@@ -33,5 +51,29 @@ public class MessageEntity {
         this.receivedAt = receivedAt;
         this.sentAt = sentAt;
         this.privateChatId = privateChatId;
+    }
+    public MessageEntity(final String body,
+                         final String sender,
+                         final MessageContentType contentType,
+                         final LocalDateTime sentAt,
+                         final Integer groupChat) {
+        this.body = body;
+        this.sender = sender;
+        this.contentType = contentType;
+        this.sentAt = sentAt;
+        this.groupChatId = groupChat;
+    }
+    public MessageEntity(final int id,
+                         final String body,
+                         final String sender,
+                         final MessageContentType contentType,
+                         final LocalDateTime sentAt,
+                         final Integer groupChat) {
+        this.id = id;
+        this.body = body;
+        this.sender = sender;
+        this.contentType = contentType;
+        this.sentAt = sentAt;
+        this.groupChatId = groupChat;
     }
 }

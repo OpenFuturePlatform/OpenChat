@@ -18,9 +18,9 @@ create table private_chat
 
 create table chat_participant
 (
-    id      serial primary key,
-    chat_id integer,
-    "user"  varchar(255)
+    id       serial primary key,
+    chat_id  integer,
+    username varchar(255)
 );
 
 create table attachment

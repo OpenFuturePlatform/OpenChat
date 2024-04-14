@@ -14,7 +14,9 @@ import io.openfuture.openmessanger.repository.PrivateChatRepository;
 import io.openfuture.openmessanger.repository.entity.ChatParticipant;
 import io.openfuture.openmessanger.repository.entity.MessageEntity;
 import io.openfuture.openmessanger.repository.entity.PrivateChat;
+import io.openfuture.openmessanger.web.request.GroupMessageRequest;
 import io.openfuture.openmessanger.web.request.MessageRequest;
+import io.openfuture.openmessanger.web.response.GroupMessageResponse;
 import io.openfuture.openmessanger.web.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,6 +88,22 @@ public class MessageServiceImpl implements MessageService {
                                    message.getReceivedAt(),
                                    message.getSentAt(),
                                    message.getPrivateChatId());
+    }
+
+    @Override
+    public GroupMessageResponse saveToGroup(GroupMessageRequest request) {
+        final MessageEntity message = new MessageEntity(request.getBody(),
+                                                        request.getSender(),
+                                                        request.getContentType(),
+                                                        LocalDateTime.now(),
+                                                        request.getGroupId());
+        messageRepository.save(message);
+        return new GroupMessageResponse(message.getId(),
+                                   message.getSender(),
+                                   message.getBody(),
+                                   message.getContentType(),
+                                   message.getSentAt(),
+                                   message.getGroupChatId());
     }
 
     @Override

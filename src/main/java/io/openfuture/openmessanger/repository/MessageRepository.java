@@ -39,7 +39,7 @@ public class MessageRepository {
 
         return jdbcOperations.query(sql,
                                     parameterSource,
-                                    selectMapper());
+                                    privateMessageSelectMapper());
     }
 
     public List<MessageEntity> findLastMessagesByUsername(final String username) {
@@ -69,7 +69,7 @@ public class MessageRepository {
 
         return jdbcOperations.query(sql,
                                     parameterSource,
-                                    selectMapper());
+                                    privateMessageSelectMapper());
     }
 
     public List<MessageEntity> findByRecipientAndSender(final String recipient, final String sender) {
@@ -94,7 +94,7 @@ public class MessageRepository {
 
         return jdbcOperations.query(sql,
                                     parameterSource,
-                                    selectMapper());
+                                    privateMessageSelectMapper());
     }
 
     public List<String> findRecipientsBySender(final String sender) {
@@ -129,7 +129,7 @@ public class MessageRepository {
         jdbcOperations.update(sql, parameterSource);
     }
 
-    private static RowMapper<MessageEntity> selectMapper() {
+    private static RowMapper<MessageEntity> privateMessageSelectMapper() {
         return (rs, rowNum) -> {
             final LocalDateTime receivedAt = rs.getTimestamp("received_at")
                                                .toLocalDateTime();
@@ -144,6 +144,20 @@ public class MessageRepository {
                                      receivedAt,
                                      sentAt,
                                      rs.getInt("private_chat_id"));
+        };
+    }
+
+    private static RowMapper<MessageEntity> groupMessageSelectMapper() {
+        return (rs, rowNum) -> {
+            final LocalDateTime sentAt = rs.getTimestamp("sent_at")
+                                               .toLocalDateTime();
+
+            return new MessageEntity(rs.getInt("id"),
+                                     rs.getString("body"),
+                                     rs.getString("sender"),
+                                     MessageContentType.valueOf(rs.getString("content_type")),
+                                     sentAt,
+                                     rs.getInt("group_chat_id"));
         };
     }
 

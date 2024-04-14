@@ -13,6 +13,7 @@ import io.openfuture.openmessanger.repository.entity.GroupParticipant;
 import io.openfuture.openmessanger.service.GroupChatService;
 import io.openfuture.openmessanger.web.request.group.AddParticipantsRequest;
 import io.openfuture.openmessanger.web.request.group.CreateGroupRequest;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,6 +22,13 @@ public class GroupChatServiceImpl implements GroupChatService {
 
     private final GroupChatRepository groupChatRepository;
     private final GroupParticipantRepository groupParticipantRepository;
+
+    @Override
+    public GroupChat get(final Integer groupId) {
+        return groupChatRepository.findById(groupId).orElseThrow(() -> {
+            throw new EntityNotFoundException(String.format("Group with ID: %s not found", groupId));
+        });
+    }
 
     @Override
     public GroupChat create(final CreateGroupRequest request) {
