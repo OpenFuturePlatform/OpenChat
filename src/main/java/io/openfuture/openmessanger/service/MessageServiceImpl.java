@@ -146,7 +146,7 @@ public class MessageServiceImpl implements MessageService {
         final List<MessageEntity> messageEntities = messageRepository.findLastMessagesByUsername(recipient);
         final List<MessageResponse> messages = convertToMessageResponse(messageEntities);
 
-        messageRepository.findGroupMessages();
+        final List<MessageEntity> groupMessages = messageRepository.findGroupMessages();
 
         return messages.stream()
                        .map(m -> {
