@@ -42,7 +42,7 @@ public class GroupChatServiceImpl implements GroupChatService {
         });
 
         final MessageEntity message = new MessageEntity(request.getCreator() + " has just created project chat " + request.getName(),
-                                                        "",
+                                                        request.getCreator(),
                                                         MessageContentType.TEXT,
                                                         LocalDateTime.now(),
                                                         groupChat.getId());
