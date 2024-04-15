@@ -1,7 +1,6 @@
 package io.openfuture.openmessanger.web.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,12 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.openfuture.openmessanger.repository.PrivateChatRepository;
-import io.openfuture.openmessanger.repository.entity.PrivateChat;
 import io.openfuture.openmessanger.service.MessageService;
 import io.openfuture.openmessanger.web.request.GroupMessageRequest;
 import io.openfuture.openmessanger.web.request.MessageRequest;
-import io.openfuture.openmessanger.web.response.FrontMessagesResponse;
 import io.openfuture.openmessanger.web.response.GroupMessageResponse;
 import io.openfuture.openmessanger.web.response.LastMessage;
 import io.openfuture.openmessanger.web.response.MessageResponse;
@@ -28,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class MessageController {
 
     private final MessageService messageService;
-    private final PrivateChatRepository privateChatRepository;
 
     @GetMapping(value = "/recipient/{username}")
     public List<MessageResponse> getByRecipient(@PathVariable("username") String recipient) {
@@ -56,7 +51,9 @@ public class MessageController {
         return messageService.getLastMessagesByRecipient(username);
     }
 
-    //TODO: Load messages by conversations id (chatUid), GET
-
+    @GetMapping(value = "/chat/{chatId}")
+    public List<MessageResponse> getMessagesByChat(@PathVariable("chatId") Integer chatId) {
+        return messageService.getMessagesByChatId(chatId, "PRIVATE_CHAT");
+    }
 
 }

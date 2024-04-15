@@ -48,6 +48,7 @@ public class GroupChatServiceImpl implements GroupChatService {
                                                         groupChat.getId());
         messageRepository.save(message);
         addParticipants(new AddParticipantsRequest(groupChat.getId(), List.of(request.getCreator())));
+        addParticipants(new AddParticipantsRequest(groupChat.getId(), request.getParticipants()));
         return groupChat;
     }
 

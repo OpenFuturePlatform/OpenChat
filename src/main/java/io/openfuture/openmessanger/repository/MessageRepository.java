@@ -112,6 +112,52 @@ public class MessageRepository {
                                     (rs, rowNum) -> rs.getString("recipient"));
     }
 
+    public List<MessageEntity> findByPrivateChatId(final Integer privateChatId) {
+        final String sql = """
+                select
+                m.id,
+                m.private_chat_id,
+                m.body,
+                m.sender,
+                m.recipient,
+                m.received_at,
+                m.content_type,
+                m.sent_at
+                    from message m
+                where m.private_chat_id = :privateChatId
+                order by received_at
+                """;
+        final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("privateChatId", privateChatId);
+
+        return jdbcOperations.query(sql,
+                                    parameterSource,
+                                    privateMessageSelectMapper());
+    }
+
+    public List<MessageEntity> findByGroupChatId(final Integer groupChatId) {
+        final String sql = """
+                select
+                m.id,
+                m.group_chat,
+                m.body,
+                m.sender,
+                m.recipient,
+                m.received_at,
+                m.content_type,
+                m.sent_at
+                    from message m
+                where m.group_chat_id = :groupChatId
+                order by received_at
+                """;
+        final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("groupChatId", groupChatId);
+
+        return jdbcOperations.query(sql,
+                                    parameterSource,
+                                    groupMessageSelectMapper());
+    }
+
     public void save(final MessageEntity message) {
         final String sql = """
                 INSERT INTO message(private_chat_id, group_chat_id, body, content_type, sender, recipient, received_at, sent_at)

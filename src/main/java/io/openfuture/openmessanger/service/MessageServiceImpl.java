@@ -1,6 +1,7 @@
 package io.openfuture.openmessanger.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -160,6 +161,19 @@ public class MessageServiceImpl implements MessageService {
                             }
                        )
                        .toList();
+    }
+
+    @Override
+    public List<MessageResponse> getMessagesByChatId(final Integer chatId, final String type) {
+        if (type.equals("PRIVATE_CHAT")) {
+            return convertToMessageResponse(messageRepository.findByPrivateChatId(chatId));
+        }
+
+        if (type.equals("GROUP_CHAT")) {
+            return convertToMessageResponse(messageRepository.findByGroupChatId(chatId));
+        }
+
+        return Collections.emptyList();
     }
 
     private List<MessageResponse> convertToMessageResponse(final List<MessageEntity> messageEntities) {

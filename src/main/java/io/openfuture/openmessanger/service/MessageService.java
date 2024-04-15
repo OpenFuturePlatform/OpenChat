@@ -15,4 +15,5 @@ public interface MessageService {
     List<MessageResponse> getAllByRecipient(String recipient);
     List<MessageResponse> getAllByRecipientAndSender(String recipient, String sender);
     List<LastMessage> getLastMessagesByRecipient(String recipient);
+    List<MessageResponse> getMessagesByChatId(final Integer chatId, final String type);
 }
