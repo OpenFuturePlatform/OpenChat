@@ -132,7 +132,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public UserResponse getCurrent(final String token) {
-        if (StringUtils.hasText(token)) {
+        if (!StringUtils.hasText(token)) {
             return null;
         }
         final String email = users.get(token);
