@@ -139,11 +139,9 @@ public class MessageRepository {
         final String sql = """
                 select
                 m.id,
-                m.group_chat,
+                m.group_chat_id,
                 m.body,
                 m.sender,
-                m.recipient,
-                m.received_at,
                 m.content_type,
                 m.sent_at
                     from message m
