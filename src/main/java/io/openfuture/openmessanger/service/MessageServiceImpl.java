@@ -1,6 +1,7 @@
 package io.openfuture.openmessanger.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.openfuture.openmessanger.repository.ChatParticipantRepository;
+import io.openfuture.openmessanger.repository.GroupChatRepository;
+import io.openfuture.openmessanger.repository.GroupParticipantRepository;
 import io.openfuture.openmessanger.repository.MessageRepository;
 import io.openfuture.openmessanger.repository.PrivateChatRepository;
 import io.openfuture.openmessanger.repository.entity.ChatParticipant;
+import io.openfuture.openmessanger.repository.entity.GroupChat;
 import io.openfuture.openmessanger.repository.entity.MessageEntity;
 import io.openfuture.openmessanger.repository.entity.PrivateChat;
 import io.openfuture.openmessanger.repository.entity.User;
@@ -36,6 +40,8 @@ public class MessageServiceImpl implements MessageService {
     private final ChatParticipantRepository chatParticipantRepository;
     private final PrivateChatService privateChatService;
     private final UserService userService;
+    private final GroupParticipantRepository groupParticipantRepository;
+    private final GroupChatRepository groupChatRepository;
 
     @Override
     public void sendMessage(final MessageRequest request) {
@@ -146,23 +152,48 @@ public class MessageServiceImpl implements MessageService {
         final List<MessageEntity> messageEntities = messageRepository.findLastMessagesByUsername(recipient);
         final List<MessageResponse> messages = convertToMessageResponse(messageEntities);
 
-        final List<MessageEntity> groupMessages = messageRepository.findGroupMessages();
+        final List<LastMessage> lastPrivateMessages = messages
+                .stream()
+                .map(m -> {
+                         final ChatParticipant otherUser = privateChatService.getOtherUser(recipient, m.privateChatId());
+                         final User user = userService.getByEmail(otherUser.getUsername());
+                         return new LastMessage(String.valueOf(m.privateChatId()),
+                                                false,
+                                                otherUser.getUsername(),
+                                                0,
+                                                m.sender(),
+                                                m.content(),
+                                                m.sentAt(),
+                                                user.getAvatar());
+                     }
+                )
+                .toList();
 
-        return messages.stream()
-                       .map(m -> {
-                                final ChatParticipant otherUser = privateChatService.getOtherUser(recipient, m.privateChatId());
-                                final User user = userService.getByEmail(otherUser.getUsername());
-                                return new LastMessage(String.valueOf(m.privateChatId()),
-                                                       false,
-                                                       otherUser.getUsername(),
-                                                       0,
-                                                       m.sender(),
-                                                       m.content(),
-                                                       m.sentAt(),
-                                                       user.getAvatar());
-                            }
-                       )
-                       .toList();
+        final List<MessageEntity> groupMessages = messageRepository.findGroupMessages(recipient);
+
+        final List<LastMessage> lastGroupMessages = groupMessages
+                .stream()
+                .map(m -> {
+                    final int memberCount = groupParticipantRepository.findAllByGroupChat(new GroupChat(m.getGroupChatId())).size();
+                    final Optional<GroupChat> groupChat = groupChatRepository.findById(m.getGroupChatId());
+
+                    return new LastMessage(String.valueOf(m.getGroupChatId()),
+                                                true,
+                                                groupChat.get().getName(),
+                                                memberCount,
+                                                m.getSender(),
+                                                m.getBody(),
+                                                m.getSentAt(),
+                                                "");
+                     }
+                )
+                .toList();
+
+        final ArrayList<LastMessage> allLastMessages = new ArrayList<>();
+        allLastMessages.addAll(lastPrivateMessages);
+        allLastMessages.addAll(lastGroupMessages);
+
+        return allLastMessages;
     }
 
     @Override
