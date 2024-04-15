@@ -41,7 +41,12 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final UserJpaRepository userJpaRepository;
     private final CognitoUserService cognitoUserService;
 
-    private ConcurrentHashMap<String, String> users = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, String> users = new ConcurrentHashMap<>() {{
+        put("eyJraWQiOiJIOTQrUmNYdWdobGZUc0JLcDRcL0taQkZ4MmhRY09PUHM3eCt1SThZam1Tcz0iLCJhbGciOiJSUzI1NiJ9" +
+                    ".eyJzdWIiOiJmZGQ3MDI5YS05MjY5LTQ5ZjEtYjJlMy01NzcwYzU0YjVlZWYiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtd2VzdC0yLmFtYXpvbmF3cy5jb21cL3VzLXdlc3QtMl9LNHV6eksxeloiLCJjbGllbnRfaWQiOiIxbWZtZWVyY2E3ZzNsMTJubnMzZDI0YjdpcyIsIm9yaWdpbl9qdGkiOiJlZTcyNDNmYy0wYWE0LTRkZmMtOGMzYi1mYjA3N2Y4MGY5NTMiLCJldmVudF9pZCI6ImViMWU5NWU4LWZiZmQtNGZiOS1hMDQzLTEwYWU5OWVlZjUzMyIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MTE0ODk2MDUsImV4cCI6MTcxMTQ5MzIwNSwiaWF0IjoxNzExNDg5NjA1LCJqdGkiOiI4NGU4NmI1Ny0xZDM4LTQ0MmQtOTA0MS1hM2Q5ODQxN2E1YzUiLCJ1c2VybmFtZSI6IjJUMVFIUXlEcUtYQzNrTEhBSUpKSm9cL2FNTkg3RmFNZkw1WGtoZ1VtQ3dVPSJ9.UxQfyZMkdm53EY0W-YxlwEOiWyH_y2WZUzMTo305VWxLErt7C9sMqPlSvMA_NK0M90wQ1Z8vpGLBN0R48YQZaFmrNPCVOl5RrMnnFKpeofNCrjjd9HfLr6ZaPW_X-0MeL3ABnFny7t-Da3aDASezTuAAcM3Qc6HlDwlaDZ9ofxXZGYMr4fqYc3J_CPgQdzdtfQd1xYMsw50APPTY38uq8698I2ZFuYe8hJftdHPTaJ3R3wP3oKk8HnM2ulzIgld7tbr6vH_FjyxBr7OSXOUV9s2rarhuxeqm4Axz8GQ7iahFCsrGoaxKytmQvy6Wk2GxPGKMJvN6-U6Ar9WIHNTrfQ",
+
+            "cool@gmail.com");
+    }};
 
     @Override
     public AuthenticatedResponse authenticate(LoginRequest userLogin) {

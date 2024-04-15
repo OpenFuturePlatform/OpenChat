@@ -209,7 +209,33 @@ public class MessageRepository {
         };
     }
 
-    public void findGroupMessages() {
+    public List<MessageEntity> findGroupMessages() {
+        final String sql = """
+                with ordered as (select id,
+                                        group_chat_id,
+                                        body,
+                                        sent_at,
+                                        received_at,
+                                        sent_at,
+                                        sender,
+                                        recipient,
+                                        content_type,
+                                        row_number() over (partition by private_chat_id order by sent_at desc ) last_message
+                                 from message mes
+                                 where mes.private_chat_id in (select pc.id
+                                                               from private_chat pc
+                                                                        join chat_participant cp on pc.id = cp.chat_id
+                                                               where cp."username" = :user))
+                                select *
+                                from ordered
+                                where last_message = 1
+                """;
+        final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("user", "username");
+
+        return jdbcOperations.query(sql,
+                                    parameterSource,
+                                    groupMessageSelectMapper());
     }
 
 }
