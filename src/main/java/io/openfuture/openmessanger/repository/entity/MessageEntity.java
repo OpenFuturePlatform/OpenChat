@@ -72,6 +72,7 @@ public class MessageEntity {
         this.id = id;
         this.body = body;
         this.sender = sender;
+        this.recipient = "";
         this.contentType = contentType;
         this.sentAt = sentAt;
         this.groupChatId = groupChat;
