@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
@@ -17,6 +18,7 @@ import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
+import com.amazonaws.services.cognitoidp.model.UnauthorizedException;
 
 import io.openfuture.openmessanger.exception.UserNotFoundException;
 import io.openfuture.openmessanger.repository.UserJpaRepository;
@@ -130,6 +132,9 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public UserResponse getCurrent(final String token) {
+        if (StringUtils.hasText(token)) {
+            return null;
+        }
         final String email = users.get(token);
 //        final AdminGetUserResult userDetails = cognitoUserService.getUserDetails(email);
 
