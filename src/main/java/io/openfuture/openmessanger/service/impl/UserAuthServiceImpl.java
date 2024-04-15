@@ -126,17 +126,19 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public UserResponse getCurrent(final String token) {
         final String email = users.get(token);
-        final AdminGetUserResult userDetails = cognitoUserService.getUserDetails(email);
+//        final AdminGetUserResult userDetails = cognitoUserService.getUserDetails(email);
 
-        final List<AttributeType> userAttributes = userDetails.getUserAttributes();
+//        final List<AttributeType> userAttributes = userDetails.getUserAttributes();
 
-        return new UserResponse(userDetails.getUsername(),
-                         get("given_name", userAttributes).getValue(),
-                         get("family_name", userAttributes).getValue(),
-                         get("email", userAttributes).getValue(),
-                                "",
-                                "",
-                                "");
+//        return new UserResponse(userDetails.getUsername(),
+//                         get("given_name", userAttributes).getValue(),
+//                         get("family_name", userAttributes).getValue(),
+//                         get("email", userAttributes).getValue(),
+//                                "",
+//                                "",
+//                                "");
+
+        return new UserResponse(email, "", "", email, "orgId", "", "");
     }
 
     AttributeType get(String name, List<AttributeType> attributeTypes) {
