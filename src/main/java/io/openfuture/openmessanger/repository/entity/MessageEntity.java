@@ -72,7 +72,9 @@ public class MessageEntity {
         this.id = id;
         this.body = body;
         this.sender = sender;
-        this.recipient = "";
+        this.privateChatId = -1;//mute errors on client
+        this.recipient = "";//mute errors on client
+        this.receivedAt = LocalDateTime.now();//mute errors on client
         this.contentType = contentType;
         this.sentAt = sentAt;
         this.groupChatId = groupChat;
