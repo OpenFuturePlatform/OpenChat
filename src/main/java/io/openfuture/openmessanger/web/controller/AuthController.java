@@ -68,7 +68,12 @@ public class AuthController {
     @GetMapping("/user")
     public UserResponse getUserDetails(@RequestHeader("Authorization") String bearerToken) {
         String accessToken = bearerToken.replace("Bearer ", "");
-        return userAuthService.getCurrent(accessToken);
+        final UserResponse current = userAuthService.getCurrent(accessToken);
+
+        if (current == null) {
+            throw new RuntimeException();
+        }
+        return current;
     }
 
     @PostMapping("/login-sms-verify")
