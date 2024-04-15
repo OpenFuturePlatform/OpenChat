@@ -112,7 +112,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public void createUser(final UserSignUpRequest signUpDTO) {
-        cognitoUserService.signUp(signUpDTO);
+//        cognitoUserService.signUp(signUpDTO);
 
         final User user = new User(signUpDTO.getEmail());
         userJpaRepository.save(user);
