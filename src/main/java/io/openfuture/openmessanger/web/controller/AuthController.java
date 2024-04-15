@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
 
+import io.jsonwebtoken.JwtBuilder;
 import io.openfuture.openmessanger.service.UserAuthService;
 import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
