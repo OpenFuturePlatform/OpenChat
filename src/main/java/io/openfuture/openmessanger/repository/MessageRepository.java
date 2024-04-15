@@ -209,29 +209,28 @@ public class MessageRepository {
         };
     }
 
-    public List<MessageEntity> findGroupMessages() {
+    public List<MessageEntity> findGroupMessages(String username) {
         final String sql = """
-                with ordered as (select id,
-                                        group_chat_id,
-                                        body,
-                                        sent_at,
-                                        received_at,
-                                        sent_at,
-                                        sender,
-                                        recipient,
-                                        content_type,
-                                        row_number() over (partition by private_chat_id order by sent_at desc ) last_message
-                                 from message mes
-                                 where mes.private_chat_id in (select pc.id
-                                                               from private_chat pc
-                                                                        join chat_participant cp on pc.id = cp.chat_id
-                                                               where cp."username" = :user))
-                                select *
-                                from ordered
-                                where last_message = 1
+                with ordered
+                         as (select id,
+                                    group_chat_id,
+                                    body,
+                                    sent_at,
+                                    sender,
+                                    content_type,
+                                    row_number() over (partition by group_chat_id order by sent_at desc ) last_message
+                             from message mes
+                             where mes.group_chat_id in
+                                   (select pc.id
+                                    from group_chat pc
+                                             join group_participant cp on pc.id = cp.group_id
+                                    where cp.participant = :user))
+                select *
+                from ordered
+                where last_message = 1
                 """;
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue("user", "username");
+                .addValue("user", username);
 
         return jdbcOperations.query(sql,
                                     parameterSource,
