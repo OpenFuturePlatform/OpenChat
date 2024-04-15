@@ -1,6 +1,7 @@
 package io.openfuture.openmessanger.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,9 +15,11 @@ import io.openfuture.openmessanger.repository.PrivateChatRepository;
 import io.openfuture.openmessanger.repository.entity.ChatParticipant;
 import io.openfuture.openmessanger.repository.entity.MessageEntity;
 import io.openfuture.openmessanger.repository.entity.PrivateChat;
+import io.openfuture.openmessanger.repository.entity.User;
 import io.openfuture.openmessanger.web.request.GroupMessageRequest;
 import io.openfuture.openmessanger.web.request.MessageRequest;
 import io.openfuture.openmessanger.web.response.GroupMessageResponse;
+import io.openfuture.openmessanger.web.response.LastMessage;
 import io.openfuture.openmessanger.web.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +34,8 @@ public class MessageServiceImpl implements MessageService {
     private final PrivateChatRepository privateChatRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatParticipantRepository chatParticipantRepository;
+    private final PrivateChatService privateChatService;
+    private final UserService userService;
 
     @Override
     public void sendMessage(final MessageRequest request) {
@@ -48,13 +53,28 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private PrivateChat getPrivateChat(final MessageRequest request) {
+        if (request.getSender().equals(request.getRecipient())) {
+            final Optional<PrivateChat> selfChat = privateChatRepository.findSelfChat(request.getSender());
+
+            if (selfChat.isPresent()) {
+                return selfChat.get();
+            }
+
+            final PrivateChat newPrivateChat = privateChatRepository.save(new PrivateChat("SELF"));
+            final ChatParticipant singleParticipant = new ChatParticipant(newPrivateChat.getId(), request.getSender());
+            chatParticipantRepository.save(singleParticipant);
+
+            newPrivateChat.setChatParticipants(List.of(singleParticipant));
+            return newPrivateChat;
+        }
+
         final Optional<PrivateChat> privateChat = privateChatRepository.findPrivateChatByParticipants(request.getSender(), request.getRecipient());
 
         if (privateChat.isPresent()) {
             return privateChat.get();
         }
 
-        final PrivateChat newPrivateChat = privateChatRepository.save(new PrivateChat());
+        final PrivateChat newPrivateChat = privateChatRepository.save(new PrivateChat("DEFAULT"));
 
         final ChatParticipant sender = new ChatParticipant(newPrivateChat.getId(), request.getSender());
         final ChatParticipant recipient = new ChatParticipant(newPrivateChat.getId(), request.getRecipient());
@@ -87,7 +107,8 @@ public class MessageServiceImpl implements MessageService {
                                    message.getContentType(),
                                    message.getReceivedAt(),
                                    message.getSentAt(),
-                                   message.getPrivateChatId());
+                                   message.getPrivateChatId(),
+                                   null);
     }
 
     @Override
@@ -99,11 +120,11 @@ public class MessageServiceImpl implements MessageService {
                                                         request.getGroupId());
         messageRepository.save(message);
         return new GroupMessageResponse(message.getId(),
-                                   message.getSender(),
-                                   message.getBody(),
-                                   message.getContentType(),
-                                   message.getSentAt(),
-                                   message.getGroupChatId());
+                                        message.getSender(),
+                                        message.getBody(),
+                                        message.getContentType(),
+                                        message.getSentAt(),
+                                        message.getGroupChatId());
     }
 
     @Override
@@ -121,9 +142,38 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<MessageResponse> getLastMessagesByRecipient(final String recipient) {
+    public List<LastMessage> getLastMessagesByRecipient(final String recipient) {
         final List<MessageEntity> messageEntities = messageRepository.findLastMessagesByUsername(recipient);
-        return convertToMessageResponse(messageEntities);
+        final List<MessageResponse> messages = convertToMessageResponse(messageEntities);
+
+        return messages.stream()
+                       .map(m -> {
+                                final ChatParticipant otherUser = privateChatService.getOtherUser(recipient, m.privateChatId());
+                                final User user = userService.getByEmail(otherUser.getUsername());
+                                return new LastMessage(String.valueOf(m.privateChatId()),
+                                                       false,
+                                                       otherUser.getUsername(),
+                                                       0,
+                                                       m.sender(),
+                                                       m.content(),
+                                                       m.sentAt(),
+                                                       user.getAvatar());
+                            }
+                       )
+                       .toList();
+    }
+
+    @Override
+    public List<MessageResponse> getMessagesByChatId(final Integer chatId, final String type) {
+        if (type.equals("PRIVATE_CHAT")) {
+            return convertToMessageResponse(messageRepository.findByPrivateChatId(chatId));
+        }
+
+        if (type.equals("GROUP_CHAT")) {
+            return convertToMessageResponse(messageRepository.findByGroupChatId(chatId));
+        }
+
+        return Collections.emptyList();
     }
 
     private List<MessageResponse> convertToMessageResponse(final List<MessageEntity> messageEntities) {
@@ -135,7 +185,8 @@ public class MessageServiceImpl implements MessageService {
                                                                   message.getContentType(),
                                                                   message.getReceivedAt(),
                                                                   message.getSentAt(),
-                                                                  message.getPrivateChatId()))
+                                                                  message.getPrivateChatId(),
+                                                                  message.getGroupChatId()))
                               .toList();
     }
 

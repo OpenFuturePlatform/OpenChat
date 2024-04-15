@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 
 import io.openfuture.openmessanger.repository.GroupChatRepository;
 import io.openfuture.openmessanger.repository.GroupParticipantRepository;
+import io.openfuture.openmessanger.repository.MessageRepository;
 import io.openfuture.openmessanger.repository.entity.GroupChat;
 import io.openfuture.openmessanger.repository.entity.GroupParticipant;
+import io.openfuture.openmessanger.repository.entity.MessageContentType;
+import io.openfuture.openmessanger.repository.entity.MessageEntity;
 import io.openfuture.openmessanger.service.GroupChatService;
 import io.openfuture.openmessanger.web.request.group.AddParticipantsRequest;
 import io.openfuture.openmessanger.web.request.group.CreateGroupRequest;
@@ -22,6 +25,7 @@ public class GroupChatServiceImpl implements GroupChatService {
 
     private final GroupChatRepository groupChatRepository;
     private final GroupParticipantRepository groupParticipantRepository;
+    private final MessageRepository messageRepository;
 
     @Override
     public GroupChat get(final Integer groupId) {
@@ -32,8 +36,20 @@ public class GroupChatServiceImpl implements GroupChatService {
 
     @Override
     public GroupChat create(final CreateGroupRequest request) {
-        final GroupChat groupChat = new GroupChat(request.getCreator(), LocalDateTime.now(), request.getName());
-        return groupChatRepository.save(groupChat);
+        final GroupChat groupChat = groupChatRepository.findByNameAndCreator(request.getName(), request.getCreator()).orElseGet(() -> {
+            final GroupChat newChatGroup = new GroupChat(request.getCreator(), LocalDateTime.now(), request.getName());
+            return groupChatRepository.save(newChatGroup);
+        });
+
+        final MessageEntity message = new MessageEntity(request.getCreator() + " has just created project chat " + request.getName(),
+                                                        "",
+                                                        MessageContentType.TEXT,
+                                                        LocalDateTime.now(),
+                                                        groupChat.getId());
+        messageRepository.save(message);
+        addParticipants(new AddParticipantsRequest(groupChat.getId(), List.of(request.getCreator())));
+        addParticipants(new AddParticipantsRequest(groupChat.getId(), request.getParticipants()));
+        return groupChat;
     }
 
     @Override
@@ -48,7 +64,7 @@ public class GroupChatServiceImpl implements GroupChatService {
         final List<String> newParticipants = request.getUsers().stream().filter(s -> !hasInGroup(existingInGroup, s)).toList();
 
         newParticipants.stream()
-                       .map(s -> new GroupParticipant(s, new GroupChat(request.getGroupId()), false))
+                       .map(s -> new GroupParticipant(s, new GroupChat(request.getGroupId()), false, LocalDateTime.now(), LocalDateTime.now()))
                        .forEach(groupParticipantRepository::save);
     }
 
@@ -64,7 +80,10 @@ public class GroupChatServiceImpl implements GroupChatService {
     @Override
     public void leave() {
         groupParticipantRepository.findAllByParticipantAndGroupChat_Id("", 1).ifPresent(
-                groupParticipant -> groupParticipant.setDeleted(true)
+                groupParticipant -> {
+                    groupParticipant.setDeleted(true);
+                    groupParticipant.setLastUpdatedAt(LocalDateTime.now());
+                }
         );
     }
 

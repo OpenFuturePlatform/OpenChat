@@ -13,7 +13,14 @@ public interface PrivateChatRepository extends JpaRepository<PrivateChat, Intege
     @Query("SELECT pc FROM PrivateChat pc " +
             "JOIN pc.chatParticipants cp1 " +
             "JOIN pc.chatParticipants cp2 " +
-            "WHERE cp1.username = :sender AND cp2.username = :recipient")
-    Optional<PrivateChat> findPrivateChatByParticipants(@Param("sender") String sender, @Param("recipient") String recipient);
+            "WHERE cp1.username = :sender AND cp2.username = :recipient " +
+            "AND pc.type = 'DEFAULT'")
+    Optional<PrivateChat> findPrivateChatByParticipants(@Param("sender") String sender,
+                                                        @Param("recipient") String recipient);
+
+    @Query("SELECT pc FROM PrivateChat pc " +
+            "JOIN pc.chatParticipants cp " +
+            "WHERE cp.username = :username AND pc.type = 'SELF' ")
+    Optional<PrivateChat> findSelfChat(String username);
 
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.openfuture.openmessanger.service.MessageService;
 import io.openfuture.openmessanger.web.request.GroupMessageRequest;
 import io.openfuture.openmessanger.web.request.MessageRequest;
-import io.openfuture.openmessanger.web.response.FrontMessagesResponse;
 import io.openfuture.openmessanger.web.response.GroupMessageResponse;
 import io.openfuture.openmessanger.web.response.LastMessage;
 import io.openfuture.openmessanger.web.response.MessageResponse;
@@ -48,23 +47,13 @@ public class MessageController {
     }
 
     @GetMapping(value = "/front-messages")
-    public FrontMessagesResponse getFrontMessages(@RequestParam(value = "user") String username) {
-        final List<MessageResponse> messages = messageService.getLastMessagesByRecipient(username);
-        final List<LastMessage> lastMessages = messages.stream()
-                                                       .map(m -> new LastMessage(String.valueOf(m.privateChatId()),
-                                                                                 false,
-                                                                                 "chatRoomName",
-                                                                                 0,
-                                                                                 m.sender(),
-                                                                                 m.content(),
-                                                                                 m.sentAt(),
-                                                                                 "")
-                                                       )
-                                                       .toList();
-        return new FrontMessagesResponse(lastMessages);
+    public List<LastMessage> getFrontMessages(@RequestParam(value = "user") String username) {
+        return messageService.getLastMessagesByRecipient(username);
     }
 
-    //TODO: Load messages by conversations id (chatUid), GET
-
+    @GetMapping(value = "/chat/{chatId}")
+    public List<MessageResponse> getMessagesByChat(@PathVariable("chatId") Integer chatId) {
+        return messageService.getMessagesByChatId(chatId, "PRIVATE_CHAT");
+    }
 
 }
