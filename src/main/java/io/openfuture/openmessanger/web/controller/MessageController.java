@@ -52,7 +52,11 @@ public class MessageController {
     }
 
     @GetMapping(value = "/chat/{chatId}")
-    public List<MessageResponse> getMessagesByChat(@PathVariable("chatId") Integer chatId) {
+    public List<MessageResponse> getMessagesByChat(@PathVariable("chatId") Integer chatId,
+                                                   @RequestParam("group") Boolean isGroup) {
+        if (isGroup) {
+            return messageService.getMessagesByChatId(chatId, "SELF_CHAT");
+        }
         return messageService.getMessagesByChatId(chatId, "PRIVATE_CHAT");
     }
 
