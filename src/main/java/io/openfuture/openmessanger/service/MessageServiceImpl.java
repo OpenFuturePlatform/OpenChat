@@ -52,13 +52,28 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private PrivateChat getPrivateChat(final MessageRequest request) {
+        if (request.getSender().equals(request.getRecipient())) {
+            final Optional<PrivateChat> selfChat = privateChatRepository.findSelfChat(request.getSender());
+
+            if (selfChat.isPresent()) {
+                return selfChat.get();
+            }
+
+            final PrivateChat newPrivateChat = privateChatRepository.save(new PrivateChat("SELF"));
+            final ChatParticipant singleParticipant = new ChatParticipant(newPrivateChat.getId(), request.getSender());
+            chatParticipantRepository.save(singleParticipant);
+
+            newPrivateChat.setChatParticipants(List.of(singleParticipant));
+            return newPrivateChat;
+        }
+
         final Optional<PrivateChat> privateChat = privateChatRepository.findPrivateChatByParticipants(request.getSender(), request.getRecipient());
 
         if (privateChat.isPresent()) {
             return privateChat.get();
         }
 
-        final PrivateChat newPrivateChat = privateChatRepository.save(new PrivateChat());
+        final PrivateChat newPrivateChat = privateChatRepository.save(new PrivateChat("DEFAULT"));
 
         final ChatParticipant sender = new ChatParticipant(newPrivateChat.getId(), request.getSender());
         final ChatParticipant recipient = new ChatParticipant(newPrivateChat.getId(), request.getRecipient());

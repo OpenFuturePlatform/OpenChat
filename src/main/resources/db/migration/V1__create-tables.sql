@@ -13,7 +13,8 @@ create table message
 
 create table private_chat
 (
-    id serial primary key
+    id   serial primary key,
+    type varchar(20)
 );
 
 create table chat_participant

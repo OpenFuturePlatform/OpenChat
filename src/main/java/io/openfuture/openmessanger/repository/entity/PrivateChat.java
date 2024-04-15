@@ -3,6 +3,7 @@ package io.openfuture.openmessanger.repository.entity;
 
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +26,14 @@ public class PrivateChat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "type")
+    private String type;
+
     @OneToMany(mappedBy = "chatId")
     private List<ChatParticipant> chatParticipants;
+
+    public PrivateChat(final String type) {
+        this.type = type;
+    }
 
 }
