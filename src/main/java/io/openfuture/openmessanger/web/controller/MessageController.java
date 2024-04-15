@@ -1,6 +1,7 @@
 package io.openfuture.openmessanger.web.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.openfuture.openmessanger.repository.PrivateChatRepository;
+import io.openfuture.openmessanger.repository.entity.PrivateChat;
 import io.openfuture.openmessanger.service.MessageService;
 import io.openfuture.openmessanger.web.request.GroupMessageRequest;
 import io.openfuture.openmessanger.web.request.MessageRequest;
@@ -25,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class MessageController {
 
     private final MessageService messageService;
+    private final PrivateChatRepository privateChatRepository;
 
     @GetMapping(value = "/recipient/{username}")
     public List<MessageResponse> getByRecipient(@PathVariable("username") String recipient) {
@@ -49,18 +53,7 @@ public class MessageController {
 
     @GetMapping(value = "/front-messages")
     public List<LastMessage> getFrontMessages(@RequestParam(value = "user") String username) {
-        final List<MessageResponse> messages = messageService.getLastMessagesByRecipient(username);
-        return messages.stream()
-                       .map(m -> new LastMessage(String.valueOf(m.privateChatId()),
-                                                                                 false,
-                                                                                 "chatRoomName",
-                                                                                 0,
-                                                                                 m.sender(),
-                                                                                 m.content(),
-                                                                                 m.sentAt(),
-                                                                                 "")
-                                                       )
-                       .toList();
+        return messageService.getLastMessagesByRecipient(username);
     }
 
     //TODO: Load messages by conversations id (chatUid), GET

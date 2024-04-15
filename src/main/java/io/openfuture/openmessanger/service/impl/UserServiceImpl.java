@@ -29,4 +29,9 @@ public class UserServiceImpl implements UserService {
         return userJpaRepository.findAll();
     }
 
+    @Override
+    public User getByEmail(final String email) {
+        return userJpaRepository.findByEmail(email);
+    }
+
 }

@@ -1,5 +1,7 @@
 package io.openfuture.openmessanger.repository.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,10 +35,21 @@ public class GroupParticipant {
     @Column(name = "deleted")
     private boolean deleted;
 
-    public GroupParticipant(final String participant, final GroupChat groupChat, final boolean deleted) {
+    @Column(name = "added_at")
+    private LocalDateTime addedAt;
+
+    @Column(name = "last_updated_at")
+    private LocalDateTime lastUpdatedAt;
+
+    public GroupParticipant(final String participant,
+                            final GroupChat groupChat,
+                            final boolean deleted,
+                            final LocalDateTime addedAt,
+                            final LocalDateTime lastUpdatedAt) {
         this.participant = participant;
         this.groupChat = groupChat;
         this.deleted = deleted;
+        this.addedAt = addedAt;
+        this.lastUpdatedAt = lastUpdatedAt;
     }
-
 }

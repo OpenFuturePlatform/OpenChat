@@ -12,5 +12,6 @@ public record MessageResponse(
         MessageContentType contentType,
         LocalDateTime receivedAt,
         LocalDateTime sentAt,
-        Integer privateChatId) {
+        Integer privateChatId,
+        Integer groupChatId) {
 }

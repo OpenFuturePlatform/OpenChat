@@ -57,8 +57,10 @@ create table group_chat
 
 create table group_participant
 (
-    id          serial primary key,
-    participant varchar(255),
-    group_id    int,
-    deleted     bool
+    id              serial primary key,
+    participant     varchar(255),
+    added_at        timestamp,
+    last_updated_at timestamp,
+    group_id        int,
+    deleted         bool
 )

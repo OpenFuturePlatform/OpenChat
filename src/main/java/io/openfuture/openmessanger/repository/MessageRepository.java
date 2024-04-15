@@ -114,12 +114,13 @@ public class MessageRepository {
 
     public void save(final MessageEntity message) {
         final String sql = """
-                INSERT INTO message(private_chat_id, body, content_type, sender, recipient, received_at, sent_at)
-                VALUES (:privateChatId, :body, :content_type, :sender, :recipient, :receivedAt, :sentAt)
+                INSERT INTO message(private_chat_id, group_chat_id, body, content_type, sender, recipient, received_at, sent_at)
+                VALUES (:privateChatId, :groupChatId, :body, :content_type, :sender, :recipient, :receivedAt, :sentAt)
                 """;
 
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue("privateChatId", message.getPrivateChatId())
+                .addValue("groupChatId", message.getGroupChatId())
                 .addValue("body", message.getBody())
                 .addValue("sender", message.getSender())
                 .addValue("recipient", message.getRecipient())

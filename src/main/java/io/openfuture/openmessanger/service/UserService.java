@@ -8,4 +8,6 @@ public interface UserService {
     Collection<User> getAllRecipientsBySender(String username);
 
     Collection<User> getAllUsers();
+
+    User getByEmail(final String email);
 }
