@@ -209,4 +209,7 @@ public class MessageRepository {
         };
     }
 
+    public void findGroupMessages() {
+    }
+
 }
