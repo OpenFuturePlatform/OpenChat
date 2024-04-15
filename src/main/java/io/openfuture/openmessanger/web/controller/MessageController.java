@@ -55,7 +55,7 @@ public class MessageController {
     public List<MessageResponse> getMessagesByChat(@PathVariable("chatId") Integer chatId,
                                                    @RequestParam(value = "group", defaultValue = "false") Boolean isGroup) {
         if (isGroup) {
-            return messageService.getMessagesByChatId(chatId, "SELF_CHAT");
+            return messageService.getMessagesByChatId(chatId, "GROUP_CHAT");
         }
         return messageService.getMessagesByChatId(chatId, "PRIVATE_CHAT");
     }
