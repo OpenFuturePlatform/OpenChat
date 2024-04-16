@@ -12,4 +12,5 @@ public interface GroupParticipantRepository extends JpaRepository<GroupParticipa
     Optional<GroupParticipant> findAllByParticipantAndGroupChat_Id(String username, Integer groupId);
 
     List<GroupParticipant> findAllByGroupChat(GroupChat groupChat);
+    List<GroupParticipant> findAllByGroupChatAndDeleted(GroupChat groupChat, boolean deleted);
 }

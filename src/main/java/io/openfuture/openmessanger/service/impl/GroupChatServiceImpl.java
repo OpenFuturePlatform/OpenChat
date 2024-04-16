@@ -16,6 +16,7 @@ import io.openfuture.openmessanger.repository.entity.MessageEntity;
 import io.openfuture.openmessanger.service.GroupChatService;
 import io.openfuture.openmessanger.web.request.group.AddParticipantsRequest;
 import io.openfuture.openmessanger.web.request.group.CreateGroupRequest;
+import io.openfuture.openmessanger.web.request.group.RemoveParticipantsRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -55,17 +56,28 @@ public class GroupChatServiceImpl implements GroupChatService {
     @Override
     public void addParticipants(final AddParticipantsRequest request) {
         //add check to get users from database as well
-        final List<GroupParticipant> existingInGroup = request.getUsers().stream().map(username -> groupParticipantRepository.findAllByParticipantAndGroupChat_Id(
-                username, request.getGroupId()
-        )).filter(Optional::isPresent).map(Optional::get).toList();
+        final List<GroupParticipant> existingInGroup = getParticipants(request.getUsers(), request.getGroupId());
 
-        existingInGroup.forEach(groupParticipant -> groupParticipant.setDeleted(false));
+        existingInGroup.stream().filter(GroupParticipant::isDeleted).forEach(groupParticipant -> {
+            groupParticipant.setDeleted(false);
+            groupParticipant.setLastUpdatedAt(LocalDateTime.now());
+        });
 
         final List<String> newParticipants = request.getUsers().stream().filter(s -> !hasInGroup(existingInGroup, s)).toList();
 
         newParticipants.stream()
                        .map(s -> new GroupParticipant(s, new GroupChat(request.getGroupId()), false, LocalDateTime.now(), LocalDateTime.now()))
                        .forEach(groupParticipantRepository::save);
+    }
+
+    @Override
+    public void removeParticipants(final RemoveParticipantsRequest request) {
+        final List<GroupParticipant> existingInGroup = getParticipants(request.getUsers(), request.getGroupId());
+
+        existingInGroup.stream().filter(GroupParticipant::isDeleted).forEach(groupParticipant -> {
+            groupParticipant.setDeleted(true);
+            groupParticipant.setLastUpdatedAt(LocalDateTime.now());
+        });
     }
 
     @Override
@@ -86,6 +98,13 @@ public class GroupChatServiceImpl implements GroupChatService {
                 }
         );
     }
+
+    private List<GroupParticipant> getParticipants(List<String> users, Integer groupId) {
+        return users.stream()
+                    .map(username -> groupParticipantRepository.findAllByParticipantAndGroupChat_Id(username, groupId))
+                    .filter(Optional::isPresent).map(Optional::get).toList();
+    }
+
 
     private boolean hasInGroup(final List<GroupParticipant> groupParticipants, final String username) {
         return groupParticipants.stream().map(GroupParticipant::getParticipant).anyMatch(user -> user.equals(username));
