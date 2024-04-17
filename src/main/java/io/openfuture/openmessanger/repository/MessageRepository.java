@@ -221,7 +221,7 @@ public class MessageRepository {
                              where mes.group_chat_id in
                                    (select pc.id
                                     from group_chat pc
-                                             join group_participant cp on pc.id = cp.group_id
+                                             join group_participant cp on pc.id = cp.group_id and cp.deleted is false
                                     where cp.participant = :user))
                 select *
                 from ordered
