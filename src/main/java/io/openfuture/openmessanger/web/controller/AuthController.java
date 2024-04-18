@@ -36,7 +36,7 @@ import io.openfuture.openmessanger.web.response.BaseResponse;
 
 @RestController
 @Validated
-@RequestMapping("/api/v1/public")
+@RequestMapping("/api/v1")
 public class AuthController {
 
     private final UserAuthService userAuthService;
@@ -45,7 +45,7 @@ public class AuthController {
         this.userAuthService = userAuthService;
     }
 
-    @PostMapping(value = "/signup")
+    @PostMapping(value = "/public/signup")
     public SignUpResponse signUp(@RequestBody @Validated UserSignUpRequest signUpDTO) {
         userAuthService.createUser(signUpDTO);
         return new SignUpResponse("User account created successfully", new SignUpResponse.Data(signUpDTO.getEmail(),
@@ -53,7 +53,7 @@ public class AuthController {
                                                                                                signUpDTO.getLastName()));
     }
 
-    @PostMapping("/login")
+    @PostMapping("/public/login")
     public LoginResponse login(@RequestBody @Validated LoginRequest loginRequest) {
         final String token = UserAuthServiceImpl.tokens.get(loginRequest.getEmail());
 //        final AuthenticatedResponse authenticate = userAuthService.authenticate(loginRequest);
@@ -70,6 +70,7 @@ public class AuthController {
     @GetMapping("/user")
     public UserResponse getUserDetails(@RequestHeader("Authorization") String bearerToken) {
         String accessToken = bearerToken.replace("Bearer ", "");
+        System.out.println("aUTH TOKEN "+bearerToken);
         final UserResponse current = userAuthService.getCurrent(accessToken);
 
         if (current == null || current.getId() == null) {

@@ -2,6 +2,7 @@ package io.openfuture.openmessanger.web.controller;
 
 import java.util.List;
 
+import io.openfuture.openmessanger.web.response.GroupDetailResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +42,22 @@ public class GroupChatController {
                                   .stream()
                                   .map(GroupParticipant::getParticipant)
                                   .toList();
+    }
+
+    @GetMapping("/{groupId}")
+    public GroupDetailResponse getGroupDetails(@PathVariable(name = "groupId") Integer groupId) {
+        List<String> participants = groupParticipantRepository.findAllByGroupChatAndDeleted(new GroupChat(groupId), false)
+                .stream()
+                .map(GroupParticipant::getParticipant)
+                .toList();
+        GroupChat groupChat = groupChatService.get(groupId);
+        GroupDetailResponse groupDetailResponse = new GroupDetailResponse();
+        groupDetailResponse.setAvatar("");
+        groupDetailResponse.setName(groupChat.getName());
+        groupDetailResponse.setId(groupChat.getId());
+        groupDetailResponse.setCreator(groupChat.getCreator());
+        groupDetailResponse.setParticipants(participants);
+        return groupDetailResponse;
     }
 
     @PutMapping("participants/add")

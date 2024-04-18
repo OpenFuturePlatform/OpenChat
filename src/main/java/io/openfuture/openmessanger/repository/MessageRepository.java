@@ -85,8 +85,8 @@ public class MessageRepository {
                 m.sent_at,
                 m.content_type
                     from message m
-                where m.recipient = :recipient and m.sender = :sender
-                order by id desc
+                where (m.recipient = :recipient and m.sender = :sender) or (m.recipient = :sender and m.sender = :recipient)
+                order by m.id asc
                 """;
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue("recipient", recipient)
