@@ -8,6 +8,7 @@ spring:
     password: 123456
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
 
 aws:
   access-key: AKIAUSWCDIFRDTGV52OL

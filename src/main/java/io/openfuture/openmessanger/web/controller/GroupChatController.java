@@ -16,8 +16,10 @@ import io.openfuture.openmessanger.repository.entity.GroupChat;
 import io.openfuture.openmessanger.repository.entity.GroupParticipant;
 import io.openfuture.openmessanger.service.GroupChatService;
 import io.openfuture.openmessanger.web.request.group.AddParticipantsRequest;
+import io.openfuture.openmessanger.web.request.group.CommonGroupsRequest;
 import io.openfuture.openmessanger.web.request.group.CreateGroupRequest;
 import io.openfuture.openmessanger.web.request.group.RemoveParticipantsRequest;
+import io.openfuture.openmessanger.web.response.CommonGroupsResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/api/v1/groups")
@@ -59,6 +61,15 @@ public class GroupChatController {
     @PostMapping("leave")
     public void leaveGroup() {
         groupChatService.leave();
+    }
+
+    @PostMapping("/commonGroups")
+    public CommonGroupsResponse getCommonGroups(@RequestBody CommonGroupsRequest request) {
+        final List<GroupChat> commonGroups = groupChatService.findCommonGroups(request.getUsername(), request.getEmail());
+
+        final List<CommonGroupsResponse.GroupInfo> groups = commonGroups.stream().map(groupChat -> new CommonGroupsResponse.GroupInfo(groupChat.getId(), groupChat.getName()))
+                                                                            .toList();
+        return new CommonGroupsResponse(request.getEmail(), "", groups);
     }
 
 }

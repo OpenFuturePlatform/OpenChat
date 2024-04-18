@@ -1,5 +1,7 @@
 package io.openfuture.openmessanger.service;
 
+import java.util.List;
+
 import io.openfuture.openmessanger.repository.entity.GroupChat;
 import io.openfuture.openmessanger.web.request.group.AddParticipantsRequest;
 import io.openfuture.openmessanger.web.request.group.CreateGroupRequest;
@@ -18,4 +20,6 @@ public interface GroupChatService {
     void archive(Integer groupId);
 
     void leave();
+
+    List<GroupChat> findCommonGroups(String userOne, String userTwo);
 }

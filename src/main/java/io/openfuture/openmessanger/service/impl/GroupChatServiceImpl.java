@@ -99,6 +99,11 @@ public class GroupChatServiceImpl implements GroupChatService {
         );
     }
 
+    @Override
+    public List<GroupChat> findCommonGroups(String userOne, String userTwo) {
+        return groupChatRepository.findAllByGroupParticipants_ParticipantContains(List.of(userOne, userTwo));
+    }
+
     private List<GroupParticipant> getParticipants(List<String> users, Integer groupId) {
         return users.stream()
                     .map(username -> groupParticipantRepository.findAllByParticipantAndGroupChat_Id(username, groupId))

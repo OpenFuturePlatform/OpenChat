@@ -52,4 +52,9 @@ public class GroupParticipant {
         this.addedAt = addedAt;
         this.lastUpdatedAt = lastUpdatedAt;
     }
+
+    public GroupParticipant(final Integer id) {
+        this.id = id;
+    }
+
 }

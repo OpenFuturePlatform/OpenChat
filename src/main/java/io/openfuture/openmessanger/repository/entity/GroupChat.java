@@ -3,12 +3,14 @@ package io.openfuture.openmessanger.repository.entity;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,6 +42,9 @@ public class GroupChat {
 
     @Column(name = "archived_at")
     private LocalDateTime archivedAt;
+
+    @OneToMany(mappedBy = "groupChat")
+    private List<GroupParticipant> groupParticipants;
 
     public GroupChat(final String creator, final LocalDateTime createdAt, final String name) {
         this.creator = creator;
