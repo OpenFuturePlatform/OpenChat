@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -28,12 +29,15 @@ import lombok.SneakyThrows;
 @Component
 public class CognitoAuthenticationProvider implements AuthenticationProvider {
 
+    @Value("${jwks.url}")
+    private String jwksUrl;
+
     @SneakyThrows
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         String token = (String) authentication.getCredentials();
 
-        final JwtParser parser = Jwts.parser().keyLocator(new MyKeyLocator()).build();
+        final JwtParser parser = Jwts.parser().keyLocator(new MyKeyLocator(jwksUrl)).build();
         final Jws<Claims> claimsJws = parser.parseSignedClaims(token);
 
         final String username = claimsJws.getPayload().get("username", String.class);
@@ -50,13 +54,19 @@ public class CognitoAuthenticationProvider implements AuthenticationProvider {
 
     public static class MyKeyLocator extends LocatorAdapter<Key> {
 
+        private final String jwksUrl;
+
+        public MyKeyLocator(final String jwksUrl) {
+            this.jwksUrl = jwksUrl;
+        }
+
         @SneakyThrows
         @Override
         protected Key locate(final ProtectedHeader header) {
             final String keyId = header.getKeyId();
 
             final ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> jwksMap = objectMapper.readValue(new URL("https://cognito-idp.us-west-2.amazonaws.com/us-west-2_K4uzzK1zZ/.well-known/jwks.json"), Map.class);
+            Map<String, Object> jwksMap = objectMapper.readValue(new URL(jwksUrl), Map.class);
 
             // Extract the keys array from the JWKS
             List<Map<String, Object>> keys = (List<Map<String, Object>>) jwksMap.get("keys");

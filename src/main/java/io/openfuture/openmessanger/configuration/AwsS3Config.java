@@ -10,8 +10,13 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class AwsS3Config {
+
+    private final AwsConfig awsConfig;
 
     @Bean
     public AmazonS3 amazonS3(AWSCredentials awsCredentials) {
@@ -25,8 +30,8 @@ public class AwsS3Config {
     @Bean
     public AWSCredentials awsCredentials() {
         return new BasicAWSCredentials(
-                "AKIAUSWCDIFRDTGV52OL",
-                "/2poY+Og6+p5ax1n8YR9WNVZD6KnrdbDDwrXq0FW"
+                awsConfig.getAccessKey(),
+                awsConfig.getSecretKey()
         );
     }
 

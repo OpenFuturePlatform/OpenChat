@@ -11,10 +11,13 @@ spring:
     show-sql: true
 
 aws:
-  access-key: AKIAUSWCDIFRDTGV52OL
-  secret-key: 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
-  region: us-west-2
+  access-key: AKIAXYKJRLFYPXI732OX
+  secret-key: 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
+  region: us-east-2
   cognito:
-    user-pool-id: us-west-2_aIKYDnG0g
-    app-client-id: lbl41afhrnidb37k8gjph6smv
-    app-client-secret: g2ur12s1gh2723f6t6gp5q4t88cu54d6qolkpa0vhps5pf7b65
+    user-pool-id: us-east-2_cQqrqGoe5
+    app-client-id: 661d1ashh62bvj8m9g4r2699qm
+    app-client-secret: 1o94g0mtth93frsihfuocl79918muchdc5iaikjcohokbvk8uc03
+
+jwks:
+  url: https://cognito-idp.us-east-2.amazonaws.com/us-east-2_cQqrqGoe5/.well-known/jwks.json

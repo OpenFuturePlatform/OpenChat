@@ -55,11 +55,10 @@ public class AuthController {
 
     @PostMapping("/public/login")
     public LoginResponse login(@RequestBody @Validated LoginRequest loginRequest) {
-        final String token = UserAuthServiceImpl.tokens.get(loginRequest.getEmail());
-//        final AuthenticatedResponse authenticate = userAuthService.authenticate(loginRequest);
-        return new LoginResponse(token,
+        final AuthenticatedResponse authenticate = userAuthService.authenticate(loginRequest);
+        return new LoginResponse(authenticate.getAccessToken(),
                                  "User logged in Successfully",
-                                 token);
+                                 authenticate.getRefreshToken());
     }
 
     @GetMapping("/current")
@@ -70,13 +69,7 @@ public class AuthController {
     @GetMapping("/user")
     public UserResponse getUserDetails(@RequestHeader("Authorization") String bearerToken) {
         String accessToken = bearerToken.replace("Bearer ", "");
-        System.out.println("aUTH TOKEN "+bearerToken);
-        final UserResponse current = userAuthService.getCurrent(accessToken);
-
-        if (current == null || current.getId() == null) {
-            throw new RuntimeException();
-        }
-        return current;
+        return userAuthService.getCurrent(accessToken);
     }
 
     @PostMapping("/login-sms-verify")
@@ -96,7 +89,7 @@ public class AuthController {
         if (bearerToken != null && bearerToken.contains("Bearer ")) {
             String accessToken = bearerToken.replace("Bearer ", "");
 
-//            userAuthService.logout(accessToken);
+            userAuthService.logout(accessToken);
 
             return new ResponseEntity<>(new BaseResponse(null, "Logout successfully", false), HttpStatus.OK);
         }

@@ -74,9 +74,7 @@ public class CognitoUserServiceImpl implements CognitoUserService {
 
     @Override
     public UserType signUp(final UserSignUpRequest request) {
-        if (validatePassword(request.getPassword())) {
-            throw new InvalidPasswordException("Password is too weak");
-        }
+        validatePassword(request.getPassword());
 
         try {
             final AdminCreateUserRequest signUpRequest = new AdminCreateUserRequest()
@@ -277,15 +275,17 @@ public class CognitoUserServiceImpl implements CognitoUserService {
         }
     }
 
-    private boolean validatePassword(final String password) {
-        if (StringUtils.hasText(password) && password.length() > 5) {
-            return false;
+    private void validatePassword(final String password) {
+        if (!StringUtils.hasText(password) && password.length() < 8) {
+            throw new InvalidPasswordException("Password is too weak");
         }
-        String regExpn = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
-
-        Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(password);
-        return matcher.matches();
+//        String regExpn = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+//
+//        Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
+//        Matcher matcher = pattern.matcher(password);
+//        if (!matcher.matches()) {
+//            throw new InvalidPasswordException("Password is too weak");
+//        }
     }
 
     private String generateValidPassword() {
