@@ -3,6 +3,7 @@ package io.openfuture.openmessanger.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.springframework.stereotype.Service;
 
@@ -74,7 +75,7 @@ public class GroupChatServiceImpl implements GroupChatService {
     public void removeParticipants(final RemoveParticipantsRequest request) {
         final List<GroupParticipant> existingInGroup = getParticipants(request.getUsers(), request.getGroupId());
 
-        existingInGroup.stream().filter(GroupParticipant::isDeleted).forEach(groupParticipant -> {
+        existingInGroup.stream().filter(Predicate.not(GroupParticipant::isDeleted)).forEach(groupParticipant -> {
             groupParticipant.setDeleted(true);
             groupParticipant.setLastUpdatedAt(LocalDateTime.now());
         });
