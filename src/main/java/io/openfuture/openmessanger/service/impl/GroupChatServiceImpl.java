@@ -62,6 +62,7 @@ public class GroupChatServiceImpl implements GroupChatService {
         existingInGroup.stream().filter(GroupParticipant::isDeleted).forEach(groupParticipant -> {
             groupParticipant.setDeleted(false);
             groupParticipant.setLastUpdatedAt(LocalDateTime.now());
+            groupParticipantRepository.save(groupParticipant);
         });
 
         final List<String> newParticipants = request.getUsers().stream().filter(s -> !hasInGroup(existingInGroup, s)).toList();
@@ -78,6 +79,7 @@ public class GroupChatServiceImpl implements GroupChatService {
         existingInGroup.stream().filter(Predicate.not(GroupParticipant::isDeleted)).forEach(groupParticipant -> {
             groupParticipant.setDeleted(true);
             groupParticipant.setLastUpdatedAt(LocalDateTime.now());
+            groupParticipantRepository.save(groupParticipant);
         });
     }
 
