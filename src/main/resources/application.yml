@@ -14,6 +14,7 @@ aws:
   access-key: AKIAXYKJRLFYPXI732OX
   secret-key: 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
   region: us-east-2
+  attachments-bucket: open-chat-attachments
   cognito:
     user-pool-id: us-east-2_cQqrqGoe5
     app-client-id: 661d1ashh62bvj8m9g4r2699qm

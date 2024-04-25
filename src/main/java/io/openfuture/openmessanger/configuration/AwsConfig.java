@@ -18,6 +18,8 @@ public class AwsConfig {
 
     private String region;
 
+    private String attachmentsBucket;
+
     private final Cognito cognito = new Cognito();
 
     @Getter
