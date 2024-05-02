@@ -22,3 +22,15 @@ aws:
 
 jwks:
   url: https://cognito-idp.us-east-2.amazonaws.com/us-east-2_cQqrqGoe5/.well-known/jwks.json
+
+openai:
+  model: gpt-3.5-turbo-0301
+  api:
+    url: https://api.openai.com/v1/chat/completions
+    key: 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
+
+
+gemini:
+  api:
+    key: AIzaSyDWkne0n1KzsTZWEzp3x7SaHyafjd0ueHU
+    url: https://generativelanguage.googleapis.com/v1beta/models

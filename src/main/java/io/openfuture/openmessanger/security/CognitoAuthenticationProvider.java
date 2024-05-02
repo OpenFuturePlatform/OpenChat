@@ -25,7 +25,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.LocatorAdapter;
 import io.jsonwebtoken.ProtectedHeader;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class CognitoAuthenticationProvider implements AuthenticationProvider {
 
@@ -43,7 +45,7 @@ public class CognitoAuthenticationProvider implements AuthenticationProvider {
         final String username = claimsJws.getPayload().get("username", String.class);
         final String scope = claimsJws.getPayload().get("scope", String.class);
         final SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(scope);
-
+        log.info("Ssss");
         return new CognitoAuthenticationToken(username, token, List.of(simpleGrantedAuthority));
     }
 
