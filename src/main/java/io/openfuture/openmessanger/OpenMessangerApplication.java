@@ -19,7 +19,7 @@ public class OpenMessangerApplication implements CommandLineRunner {
 
     @Override
     public void run(final String... args) throws Exception {
-        geminiService.chat("123232312321");
+        System.out.println(geminiService.chat(""));
     }
 
 }

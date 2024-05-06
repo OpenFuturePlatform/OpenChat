@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.openfuture.openmessanger.assistant.gemini.GeminiService;
 import io.openfuture.openmessanger.repository.ChatParticipantRepository;
 import io.openfuture.openmessanger.repository.GroupChatRepository;
 import io.openfuture.openmessanger.repository.GroupParticipantRepository;
@@ -17,11 +18,13 @@ import io.openfuture.openmessanger.repository.MessageRepository;
 import io.openfuture.openmessanger.repository.PrivateChatRepository;
 import io.openfuture.openmessanger.repository.entity.ChatParticipant;
 import io.openfuture.openmessanger.repository.entity.GroupChat;
+import io.openfuture.openmessanger.repository.entity.MessageContentType;
 import io.openfuture.openmessanger.repository.entity.MessageEntity;
 import io.openfuture.openmessanger.repository.entity.PrivateChat;
 import io.openfuture.openmessanger.repository.entity.User;
 import io.openfuture.openmessanger.web.request.GroupMessageRequest;
 import io.openfuture.openmessanger.web.request.MessageRequest;
+import io.openfuture.openmessanger.web.request.MessageToAssistantRequest;
 import io.openfuture.openmessanger.web.response.GroupMessageResponse;
 import io.openfuture.openmessanger.web.response.LastMessage;
 import io.openfuture.openmessanger.web.response.MessageResponse;
@@ -42,6 +45,7 @@ public class MessageServiceImpl implements MessageService {
     private final UserService userService;
     private final GroupParticipantRepository groupParticipantRepository;
     private final GroupChatRepository groupChatRepository;
+    private final GeminiService geminiService;
 
     @Override
     public void sendMessage(final MessageRequest request) {
@@ -118,6 +122,43 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public MessageResponse saveAssistant(MessageToAssistantRequest request) {
+        log.info("POST REQUEST {}", request);
+
+        final MessageRequest aiAssistant = new MessageRequest(request.getSender(), "AI_ASSISTANT", request.getContentType(), request.getBody());
+        final PrivateChat privateChat = getPrivateChat(aiAssistant);
+
+        final MessageEntity message = new MessageEntity(request.getBody(),
+                                                        request.getSender(),
+                                                        "AI_ASSISTANT",
+                                                        request.getContentType(),
+                                                        LocalDateTime.now(),
+                                                        LocalDateTime.now(),
+                                                        privateChat.getId());
+        messageRepository.save(message);
+
+        final String response = geminiService.chat(request.getBody());
+        final MessageEntity responseMessage = new MessageEntity(response,
+                                                        "AI_ASSISTANT",//he is a Sender
+                                                        request.getSender(),//now he is recipient
+                                                        request.getContentType(),
+                                                        LocalDateTime.now(),
+                                                        LocalDateTime.now(),
+                                                        privateChat.getId());
+        messageRepository.save(responseMessage);
+
+        return new MessageResponse(message.getId(),
+                                   message.getSender(),
+                                   message.getRecipient(),
+                                   message.getBody(),
+                                   message.getContentType(),
+                                   message.getReceivedAt(),
+                                   message.getSentAt(),
+                                   message.getPrivateChatId(),
+                                   null);
+    }
+
+    @Override
     public GroupMessageResponse saveToGroup(GroupMessageRequest request) {
         final MessageEntity message = new MessageEntity(request.getBody(),
                                                         request.getSender(),
@@ -150,7 +191,9 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<LastMessage> getLastMessagesByRecipient(final String recipient) {
         final List<MessageEntity> messageEntities = messageRepository.findLastMessagesByUsername(recipient);
-        final List<MessageResponse> messages = convertToMessageResponse(messageEntities);
+        final List<MessageEntity> filtered = messageEntities.stream().filter(message -> !message.getRecipient().equals("AI_ASSISTANT"))
+                                                                    .filter(message -> !message.getSender().equals("AI_ASSISTANT")).toList();
+        final List<MessageResponse> messages = convertToMessageResponse(filtered);
 
         final List<LastMessage> lastPrivateMessages = messages
                 .stream()
@@ -164,7 +207,7 @@ public class MessageServiceImpl implements MessageService {
                                                 m.sender(),
                                                 m.content(),
                                                 m.sentAt(),
-                                                user.getAvatar());
+                                                null);
                      }
                 )
                 .toList();

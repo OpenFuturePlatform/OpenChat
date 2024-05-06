@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.openfuture.openmessanger.service.MessageService;
 import io.openfuture.openmessanger.web.request.GroupMessageRequest;
 import io.openfuture.openmessanger.web.request.MessageRequest;
+import io.openfuture.openmessanger.web.request.MessageToAssistantRequest;
 import io.openfuture.openmessanger.web.response.GroupMessageResponse;
 import io.openfuture.openmessanger.web.response.LastMessage;
 import io.openfuture.openmessanger.web.response.MessageResponse;
@@ -33,6 +34,11 @@ public class MessageController {
     @PostMapping
     public MessageResponse save(@RequestBody MessageRequest messageRequest) {
         return messageService.save(messageRequest);
+    }
+
+    @PostMapping("assistant")
+    public MessageResponse saveAssistantMessage(@RequestBody MessageToAssistantRequest messageRequest) {
+        return messageService.saveAssistant(messageRequest);
     }
 
     @PostMapping("/group")
