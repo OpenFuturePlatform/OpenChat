@@ -1,4 +1,3 @@
-```
 # AI Chat Assistant App
 
 Welcome to our AI Chat Assistant App repository! This project aims to create a user-friendly chat application with an AI assistant powered by advanced natural language processing (NLP) techniques. With this app, users can engage in conversations, ask questions, and receive helpful responses from our AI assistant.
@@ -13,21 +12,6 @@ Welcome to our AI Chat Assistant App repository! This project aims to create a u
 
 ## Technologies Used
 
-
-
-3. Set up environment variables and configuration files as per instructions in the respective directories.
-
-4. Run the frontend and backend servers:
-
-```bash
-# In frontend directory
-npm start
-
-# In backend directory
-npm start
-```
-
-5. Access the application via your web browser at `http://localhost:3000` by default.
 
 ## Contributing
 
