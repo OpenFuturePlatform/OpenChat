@@ -3,7 +3,7 @@ spring:
     name: open-chat
   datasource:
     username: root
-    password: 123456
+    password:
     url: jdbc:mysql://localhost:3310/open_chat?useSSL=false&characterEncoding=utf-8&allowPublicKeyRetrieval=true
     hikari:
       maximum-pool-size: 20
@@ -13,10 +13,10 @@ spring:
       ddl-auto: none
 
 aws:
-  access-key: AKIAUSWCDIFRDTGV52OL
-  secret-key: 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
+  access-key:
+  secret-key:
   region: us-west-2
   cognito:
-    user-pool-id: us-west-2_aIKYDnG0g
-    app-client-id: lbl41afhrnidb37k8gjph6smv
-    app-client-secret: g2ur12s1gh2723f6t6gp5q4t88cu54d6qolkpa0vhps5pf7b65
+    user-pool-id:
+    app-client-id:
+    app-client-secret:
