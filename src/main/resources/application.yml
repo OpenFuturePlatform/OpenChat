@@ -29,7 +29,6 @@ openai:
     url: https://api.openai.com/v1/chat/completions
     key: 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
 
-
 gemini:
   api:
     key: AIzaSyDWkne0n1KzsTZWEzp3x7SaHyafjd0ueHU
