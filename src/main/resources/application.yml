@@ -5,31 +5,31 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5434/open_chat
     username: postgres
-    password:
+    password: 123456
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 
 aws:
-  access-key:
-  secret-key:
-  region:
-  attachments-bucket:
+  access-key: AKIAXYKJRLFYPXI732OX
+  secret-key: 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
+  region: us-east-2
+  attachments-bucket: open-chat-attachments
   cognito:
-    user-pool-id:
-    app-client-id:
-    app-client-secret:
+    user-pool-id: us-east-2_cQqrqGoe5
+    app-client-id: 661d1ashh62bvj8m9g4r2699qm
+    app-client-secret: 1o94g0mtth93frsihfuocl79918muchdc5iaikjcohokbvk8uc03
 
 jwks:
-  url:
+  url: https://cognito-idp.us-east-2.amazonaws.com/us-east-2_cQqrqGoe5/.well-known/jwks.json
 
 openai:
   model: gpt-3.5-turbo-0301
   api:
-    url:
-    key:
+    url: https://api.openai.com/v1/chat/completions
+    key: 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
 
 gemini:
   api:
-    key:
-    url:
+    key: AIzaSyDWkne0n1KzsTZWEzp3x7SaHyafjd0ueHU
+    url: https://generativelanguage.googleapis.com/v1beta/models
