@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,12 +41,17 @@ public class CognitoAuthenticationProvider implements AuthenticationProvider {
         String token = (String) authentication.getCredentials();
 
         final JwtParser parser = Jwts.parser().keyLocator(new MyKeyLocator(jwksUrl)).build();
-        final Jws<Claims> claimsJws = parser.parseSignedClaims(token);
+        final Jws<Claims> claimsJws;
+        try {
+            claimsJws = parser.parseSignedClaims(token);
+        } catch (Exception e) {
+            throw new BadCredentialsException("Unable to parse access token", e);
+        }
 
         final String username = claimsJws.getPayload().get("username", String.class);
         final String scope = claimsJws.getPayload().get("scope", String.class);
         final SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(scope);
-        log.info("Ssss");
+
         return new CognitoAuthenticationToken(username, token, List.of(simpleGrantedAuthority));
     }
 
