@@ -8,8 +8,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -38,6 +36,7 @@ import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordRequest;
 import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
+import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
 import com.amazonaws.services.cognitoidp.model.DeliveryMediumType;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordRequest;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
@@ -237,9 +236,9 @@ public class CognitoUserServiceImpl implements CognitoUserService {
     }
 
     @Override
-    public AdminGetUserResult getUserDetails(String email) {
+    public AdminGetUserResult getUserDetails(String cognitoId) {
         return awsCognitoIdentityProvider
-                .adminGetUser(new AdminGetUserRequest().withUsername(email)
+                .adminGetUser(new AdminGetUserRequest().withUsername(cognitoId)
                                                        .withUserPoolId(awsConfig.getCognito().getUserPoolId()));
     }
 
@@ -256,6 +255,21 @@ public class CognitoUserServiceImpl implements CognitoUserService {
         } catch (NotAuthorizedException e) {
             throw new FailedAuthenticationException(String.format("Forgot password failed: %s", e.getErrorMessage()), e);
         }
+    }
+
+    @Override
+    public AuthenticationResultType refreshAccessToken(final String userId, final String refreshToken) {
+        final HashMap<String, String> authParams = new HashMap<>();
+        authParams.put(CognitoAttributesEnum.REFRESH_TOKEN.name(), refreshToken);
+        authParams.put(CognitoAttributesEnum.USERNAME.name(), userId);
+        authParams.put(CognitoAttributesEnum.SECRET_HASH.name(), calculateSecretHash(awsConfig.getCognito().getAppClientId(), awsConfig.getCognito().getAppClientSecret(), userId));
+        AdminInitiateAuthRequest authRequest = new AdminInitiateAuthRequest()
+                .withAuthFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
+                .withUserPoolId(awsConfig.getCognito().getUserPoolId())
+                .withClientId(awsConfig.getCognito().getAppClientId())
+                .withAuthParameters(authParams);
+        final AdminInitiateAuthResult authResult = awsCognitoIdentityProvider.adminInitiateAuth(authRequest);
+        return authResult.getAuthenticationResult();
     }
 
     private String calculateSecretHash(String userPoolClientId, String userPoolClientSecret, String userName) {

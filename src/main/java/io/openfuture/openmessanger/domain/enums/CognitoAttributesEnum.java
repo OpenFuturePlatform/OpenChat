@@ -9,7 +9,8 @@ public enum CognitoAttributesEnum {
     PASSWORD("PASSWORD"),
     SECRET_HASH("SECRET_HASH"),
     NEW_PASSWORD("NEW_PASSWORD"),
-    SMS_MFA_CODE("SMS_MFA_CODE");
+    SMS_MFA_CODE("SMS_MFA_CODE"),
+    REFRESH_TOKEN("REFRESH_TOKEN");
 
     private final String values;
 

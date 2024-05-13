@@ -48,8 +48,12 @@ public class User {
     @Column(name = "active")
     private boolean active = true; // default value
 
-    public User(final String email) {
+    public User(final String email,
+                final String firstName,
+                final String lastName) {
         this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.registeredAt = ZonedDateTime.now();
     }
 

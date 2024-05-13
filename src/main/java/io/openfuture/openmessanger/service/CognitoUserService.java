@@ -7,6 +7,7 @@ import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeResult;
 import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordResult;
+import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
 import com.amazonaws.services.cognitoidp.model.GlobalSignOutResult;
 import com.amazonaws.services.cognitoidp.model.UserType;
@@ -25,6 +26,8 @@ public interface CognitoUserService {
     AdminGetUserResult getUserDetails(String email);
 
     ForgotPasswordResult forgotPassword(String username);
+
+    AuthenticationResultType refreshAccessToken(String email, String refreshToken);
 
     void addUserToGroup(String username, String groupName);
 

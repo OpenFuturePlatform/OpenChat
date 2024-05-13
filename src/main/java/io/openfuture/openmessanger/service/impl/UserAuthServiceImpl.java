@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.validation.constraints.NotNull;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -16,6 +18,7 @@ import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminListUserAuthEventsResult;
 import com.amazonaws.services.cognitoidp.model.AdminRespondToAuthChallengeResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
+import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
 import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
 
 import io.openfuture.openmessanger.exception.UserNotFoundException;
@@ -26,6 +29,7 @@ import io.openfuture.openmessanger.service.UserAuthService;
 import io.openfuture.openmessanger.service.dto.AuthenticatedChallengeRequest;
 import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
+import io.openfuture.openmessanger.service.dto.RefreshTokenRequest;
 import io.openfuture.openmessanger.service.dto.UserPasswordUpdateRequest;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
 import io.openfuture.openmessanger.service.response.UserResponse;
@@ -74,6 +78,18 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
+    public AuthenticatedResponse refreshToken(final RefreshTokenRequest request) {
+        final UserResponse current = getCurrent();
+        final AuthenticationResultType result = cognitoUserService.refreshAccessToken(current.getId(), request.refreshToken());
+        return AuthenticatedResponse.builder()
+                                    .accessToken(result.getAccessToken())
+                                    .idToken(result.getIdToken())
+                                    .refreshToken(result.getRefreshToken())
+                                    .username(current.getEmail())
+                                    .build();
+    }
+
+    @Override
     public AuthenticatedResponse authenticateSms(final LoginSmsVerifyRequest loginSmsVerifyRequest) {
         final AdminRespondToAuthChallengeResult result = cognitoUserService.respondToAuthSmsChallenge(loginSmsVerifyRequest.getUsername(),
                                                                                                       loginSmsVerifyRequest.getSms(),
@@ -115,7 +131,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     public void createUser(final UserSignUpRequest signUpDTO) {
         cognitoUserService.signUp(signUpDTO);
 
-        final User user = new User(signUpDTO.getEmail());
+        final User user = new User(signUpDTO.getEmail(), signUpDTO.getFirstName(), signUpDTO.getLastName());
         userJpaRepository.save(user);
     }
 
@@ -125,9 +141,10 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    public UserResponse getCurrent(final String token) {
-        final String email = users.get(token);
-        final AdminGetUserResult userDetails = cognitoUserService.getUserDetails(email);
+    public UserResponse getCurrent() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final String userId = (String) authentication.getPrincipal();
+        final AdminGetUserResult userDetails = cognitoUserService.getUserDetails(userId);
 
         final List<AttributeType> userAttributes = userDetails.getUserAttributes();
 

@@ -25,6 +25,7 @@ import io.jsonwebtoken.JwtBuilder;
 import io.openfuture.openmessanger.service.UserAuthService;
 import io.openfuture.openmessanger.service.dto.LoginRequest;
 import io.openfuture.openmessanger.service.dto.LoginSmsVerifyRequest;
+import io.openfuture.openmessanger.service.dto.RefreshTokenRequest;
 import io.openfuture.openmessanger.service.dto.UserPasswordUpdateRequest;
 import io.openfuture.openmessanger.service.dto.UserSignUpRequest;
 import io.openfuture.openmessanger.service.impl.UserAuthServiceImpl;
@@ -61,15 +62,22 @@ public class AuthController {
                                  authenticate.getRefreshToken());
     }
 
+    @PostMapping("/refreshToken")
+    public LoginResponse refreshToken(@RequestBody @Validated RefreshTokenRequest request) {
+        final AuthenticatedResponse authenticate = userAuthService.refreshToken(request);
+        return new LoginResponse(authenticate.getAccessToken(),
+                                 "Token refreshed",
+                                 authenticate.getRefreshToken());
+    }
+
     @GetMapping("/current")
     public ResponseEntity<String> current(@AuthenticationPrincipal String username) {
         return new ResponseEntity<>(username, HttpStatus.OK);
     }
 
     @GetMapping("/user")
-    public UserResponse getUserDetails(@RequestHeader("Authorization") String bearerToken) {
-        String accessToken = bearerToken.replace("Bearer ", "");
-        return userAuthService.getCurrent(accessToken);
+    public UserResponse getUserDetails() {
+        return userAuthService.getCurrent();
     }
 
     @PostMapping("/login-sms-verify")
