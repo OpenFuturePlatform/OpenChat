@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,6 +41,9 @@ public class CognitoAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         String token = (String) authentication.getCredentials();
 
+        if (!StringUtils.hasText(token)) {
+            throw new BadCredentialsException("Token not provided");
+        }
         final JwtParser parser = Jwts.parser().keyLocator(new MyKeyLocator(jwksUrl)).build();
         final Jws<Claims> claimsJws;
         try {
