@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations
+import org.springframework.jdbc.support.GeneratedKeyHolder
+import org.springframework.jdbc.support.KeyHolder
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 
@@ -159,7 +161,7 @@ class MessageRepository(
         )
     }
 
-    fun save(message: MessageEntity) {
+    fun save(message: MessageEntity): Int {
         val sql = """
                 INSERT INTO message(private_chat_id, group_chat_id, body, content_type, sender, recipient, received_at, sent_at)
                 VALUES (:privateChatId, :groupChatId, :body, :content_type, :sender, :recipient, :receivedAt, :sentAt)
@@ -174,7 +176,11 @@ class MessageRepository(
             .addValue("content_type", message.contentType.name)
             .addValue("receivedAt", message.receivedAt)
             .addValue("sentAt", message.sentAt)
-        jdbcOperations!!.update(sql, parameterSource)
+
+        val keyHolder = GeneratedKeyHolder()
+        jdbcOperations.update(sql, parameterSource, keyHolder)
+
+        return keyHolder.keys?.get("id") as Int
     }
 
     fun findGroupMessages(username: String?): List<MessageEntity> {
@@ -200,7 +206,7 @@ class MessageRepository(
                 """.trimIndent()
         val parameterSource = MapSqlParameterSource()
             .addValue("user", username)
-        return jdbcOperations!!.query(
+        return jdbcOperations.query(
             sql,
             parameterSource,
             groupMessageSelectMapper()

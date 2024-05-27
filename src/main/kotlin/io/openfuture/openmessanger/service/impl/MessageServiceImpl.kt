@@ -134,16 +134,16 @@ class MessageServiceImpl(
             LocalDateTime.now(),
             privateChat.id
         )
-        messageRepository.save(responseMessage)
+        val id = messageRepository.save(responseMessage)
         return MessageResponse(
-            message.id,
-            message.sender,
-            message.recipient!!,
+            id,
+            responseMessage.sender,
+            responseMessage.recipient!!,
             response!!,
-            message.contentType,
-            message.receivedAt!!,
-            message.sentAt,
-            message.privateChatId!!,
+            responseMessage.contentType,
+            responseMessage.receivedAt!!,
+            responseMessage.sentAt,
+            responseMessage.privateChatId!!,
             null
         )
     }

@@ -3,7 +3,7 @@ package io.openfuture.openmessanger.repository.entity
 import java.time.LocalDateTime
 
 class MessageEntity {
-    var id = 0
+    var id: Int = 0
     var body: String?
     var sender: String
     var recipient: String? = null
