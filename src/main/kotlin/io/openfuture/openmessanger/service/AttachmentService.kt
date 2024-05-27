@@ -13,4 +13,6 @@ interface AttachmentService {
 
     @Throws(IOException::class)
     fun download(fileName: String?): ByteArray?
+
+    fun downloadById(id: Int): ByteArray?
 }

@@ -41,4 +41,13 @@ class AttachmentServiceImpl(
         val s3is = o.objectContent
         return IOUtils.toByteArray(s3is)
     }
+
+    @Throws(IOException::class)
+    override fun downloadById(id: Int): ByteArray? {
+        val attachmentResponses = attachmentRepository.get(listOf(id))
+        val fileName = attachmentResponses?.get(0)?.name
+        val o = amazonS3.getObject(awsConfig.attachmentsBucket, fileName)
+        val s3is = o.objectContent
+        return IOUtils.toByteArray(s3is)
+    }
 }

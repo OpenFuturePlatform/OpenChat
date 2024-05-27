@@ -1,5 +1,6 @@
 package io.openfuture.openmessanger.repository
 
+import io.openfuture.openmessanger.repository.entity.dto.AttachmentResponse
 import lombok.RequiredArgsConstructor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations
@@ -25,6 +26,23 @@ class AttachmentRepository(
 
         jdbcOperations.update(sql, parameterSource, keyHolder)
         return keyHolder.keys?.get("id") as Int?
+    }
+
+    fun get(id: List<Int>): List<AttachmentResponse>? {
+        val sql = """
+                select id, name, url from attachment where id=:id;
+                """.trimIndent()
+        val parameterSource = MapSqlParameterSource()
+            .addValue("id", id)
+
+        return jdbcOperations.query(sql, parameterSource) { rs, rowNum ->
+            AttachmentResponse(
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("url")
+            )
+        }
+
     }
 
 }

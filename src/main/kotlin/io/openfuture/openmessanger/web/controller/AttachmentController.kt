@@ -40,4 +40,16 @@ class AttachmentController (
         response.outputStream.write(fileData)
         response.flushBuffer()
     }
+
+    @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
+    @Throws(IOException::class)
+    fun download(response: HttpServletResponse, @PathVariable(value = "id") id: Int) {
+        val fileData = attachmentService.downloadById(id)
+        response.reset()
+        response.contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment$id")
+        response.setContentLength(fileData!!.size)
+        response.outputStream.write(fileData)
+        response.flushBuffer()
+    }
 }
