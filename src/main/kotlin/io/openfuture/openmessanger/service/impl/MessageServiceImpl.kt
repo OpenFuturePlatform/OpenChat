@@ -139,7 +139,7 @@ class MessageServiceImpl(
             message.id,
             message.sender,
             message.recipient!!,
-            message.body!!,
+            response!!,
             message.contentType,
             message.receivedAt!!,
             message.sentAt,
@@ -245,8 +245,8 @@ class MessageServiceImpl(
                 message.contentType,
                 message.receivedAt!!,
                 message.sentAt,
-                message.privateChatId!!,
-                message.groupChatId!!,
+                message.privateChatId,
+                message.groupChatId,
                 attachments.map { messageAttachment -> messageAttachment.attachmentId!! }
             )
         }

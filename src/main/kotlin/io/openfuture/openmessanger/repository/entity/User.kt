@@ -9,7 +9,7 @@ class User(email: String? = null, firstName: String? = null, lastName: String? =
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id = 0
+    val id = 0
 
     @Column(name = "email", unique = false)
     var email: String? = null

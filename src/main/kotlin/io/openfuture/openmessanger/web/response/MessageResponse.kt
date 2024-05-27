@@ -11,7 +11,7 @@ data class MessageResponse(
     var contentType: MessageContentType,
     var receivedAt: LocalDateTime,
     var sentAt: LocalDateTime,
-    var privateChatId: Int,
+    var privateChatId: Int?,
     var groupChatId: Int?,
     var attachments: List<Int> = emptyList()
 )
