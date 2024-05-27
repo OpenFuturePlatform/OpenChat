@@ -21,17 +21,17 @@ class User(email: String? = null, firstName: String? = null, lastName: String? =
     var lastName: String? = null
 
     @Column(name = "phone_number")
-    private val phoneNumber: String? = null
+    val phoneNumber: String? = null
 
     @Column(name = "registered_at")
-    private val registeredAt: ZonedDateTime = ZonedDateTime.now()
+    val registeredAt: ZonedDateTime = ZonedDateTime.now()
 
     @Column(name = "last_login")
-    private val lastLogin: ZonedDateTime? = null
+    val lastLogin: ZonedDateTime? = null
 
     @Column(name = "avatar")
-    private val avatar: String? = null
+    val avatar: String? = null
 
     @Column(name = "active")
-    private val active = true
+    val active = true
 }
