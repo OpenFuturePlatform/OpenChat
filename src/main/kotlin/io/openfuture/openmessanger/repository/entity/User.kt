@@ -5,7 +5,7 @@ import java.time.ZonedDateTime
 
 @Entity
 @Table(name = "open_user")
-class User {
+class User(email: String? = null, firstName: String? = null, lastName: String? = null) {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
