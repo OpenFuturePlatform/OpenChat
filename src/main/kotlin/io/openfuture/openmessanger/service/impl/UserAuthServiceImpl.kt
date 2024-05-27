@@ -44,7 +44,7 @@ class UserAuthServiceImpl(
 
     override fun refreshToken(request: RefreshTokenRequest): AuthenticatedResponse {
         val current = current()
-        val result = cognitoUserService!!.refreshAccessToken(current.id, request.refreshToken)
+        val result = cognitoUserService.refreshAccessToken(current.id, request.refreshToken)
         return AuthenticatedResponse(
             current.email,
             result?.accessToken,
@@ -77,10 +77,7 @@ class UserAuthServiceImpl(
 
     override fun createUser(signUpDTO: UserSignUpRequest) {
         cognitoUserService.signUp(signUpDTO)
-        val user = User()
-        user.email = signUpDTO.email
-        user.firstName = signUpDTO.firstName
-        user.lastName = signUpDTO.lastName
+        val user = User(signUpDTO.email, signUpDTO.firstName, signUpDTO.lastName)
         userJpaRepository.save(user)
     }
 
