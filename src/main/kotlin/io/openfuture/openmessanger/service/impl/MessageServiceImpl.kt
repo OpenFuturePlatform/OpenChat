@@ -94,6 +94,7 @@ class MessageServiceImpl(
             privateChat.id
         )
 
+        messageRepository.save(message)
         request.attachments.forEach { attachment -> messageAttachmentRepository.save(MessageAttachment(attachment, message.id)) }
 
         return MessageResponse(
