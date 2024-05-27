@@ -40,7 +40,8 @@ class AwsCognitoTokenFilter(
     @Throws(AuthenticationException::class, IOException::class, ServletException::class)
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
         val header = request.getHeader(HttpHeaders.AUTHORIZATION)
-        if (header == null || header.isEmpty()) {
+        log.info("Header : $header")
+        if (header == null || header.isEmpty() || header.length == 6) {
             log.info("Token is not provided")
             throw AuthenticationServiceException("Token is missing")
         }
