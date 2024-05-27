@@ -2,23 +2,23 @@ package io.openfuture.openmessanger.repository.entity
 
 import jakarta.persistence.*
 import java.time.ZonedDateTime
-import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
 
 @Entity
 @Table(name = "open_user")
-class User(email: @NotBlank @NotNull @Email String?, firstName: @NotBlank @NotNull String?, lastName: String?) {
+class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private val id = 0
 
-    private val email: String? = null
+    @Column(name = "email", unique = false)
+    var email: String? = null
 
-    private val firstName: String? = null
+    @Column(name = "first_name")
+    var firstName: String? = null
 
-    private val lastName: String? = null
+    @Column(name = "last_name")
+    var lastName: String? = null
 
     @Column(name = "phone_number")
     private val phoneNumber: String? = null
