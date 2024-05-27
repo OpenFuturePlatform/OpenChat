@@ -1,13 +1,16 @@
-package io.openfuture.openmessanger;
+package io.openfuture.openmessanger
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.Test
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ContextConfiguration
+
 
 @SpringBootTest
-class OpenMessangerApplicationTests extends TestInitializer {
+@ContextConfiguration(initializers = [TestInitializer::class])
+class OpenMessangerApplicationTests {
 
     @Test
-    void contextLoads() {
+    fun contextLoads() {
     }
 
 }
