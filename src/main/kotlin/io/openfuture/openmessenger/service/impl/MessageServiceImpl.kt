@@ -233,8 +233,6 @@ class MessageServiceImpl(
     }
 
     private fun convertToMessageResponse(messageEntities: List<MessageEntity?>?): List<MessageResponse>? {
-
-
         return messageEntities?.map { message: MessageEntity? ->
             val attachments = messageAttachmentRepository.findAllByMessageId(message!!.id)
             MessageResponse(

@@ -14,7 +14,7 @@ class PrivateChatServiceImpl(
 
     override fun getOtherUser(username: String, chatId: Int?): ChatParticipant? {
         val participants = chatParticipantRepository.findAllByChatId(chatId)
-        if (participants!!.size == 1) {
+        if (participants.size == 1) {
             return participants[0]
         }
         val recipient = participants.stream()
@@ -22,4 +22,9 @@ class PrivateChatServiceImpl(
             .findFirst()
         return recipient.orElseThrow { IllegalStateException("No other participants of chat") }
     }
+
+    override fun getParticipants(chatId: Int?): List<ChatParticipant>? {
+        return chatParticipantRepository.findAllByChatId(chatId)
+    }
+
 }
