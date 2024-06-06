@@ -2,6 +2,7 @@ package io.openfuture.openmessenger.web.controller
 
 import io.openfuture.openmessenger.assistant.model.ConversationNotes
 import io.openfuture.openmessenger.assistant.model.Reminder
+import io.openfuture.openmessenger.assistant.model.Todos
 import io.openfuture.openmessenger.service.AssistantService
 import io.openfuture.openmessenger.service.dto.AssistantRequest
 import org.springframework.web.bind.annotation.PostMapping
@@ -27,6 +28,13 @@ class PromptController(
         @RequestBody request: AssistantRequest
     ): Reminder? {
         return assistantService.generateReminder(request)
+    }
+
+    @PostMapping("/generateTodos")
+    fun generateTodos(
+        @RequestBody request: AssistantRequest
+    ): Todos? {
+        return assistantService.generateTodos(request)
     }
 
 }
