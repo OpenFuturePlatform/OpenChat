@@ -1,12 +1,10 @@
 package io.openfuture.openmessenger.service.impl
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.openfuture.openmessenger.assistant.gemini.GeminiService
-import io.openfuture.openmessenger.assistant.model.ConversationNotes
-import io.openfuture.openmessenger.assistant.model.Reminder
-import io.openfuture.openmessenger.assistant.model.ReminderItem
-import io.openfuture.openmessenger.assistant.model.Todos
+import io.openfuture.openmessenger.assistant.model.*
 import io.openfuture.openmessenger.repository.MessageJdbcRepository
 import io.openfuture.openmessenger.repository.entity.Message
 import io.openfuture.openmessenger.service.AssistantService
@@ -54,6 +52,7 @@ class AssistantServiceImpl(
         } else privateChatService.getParticipants(assistantRequest.chatId)?.map { it.username!! }
 
         val objectMapper = jacksonObjectMapper()
+        objectMapper.registerModule(JavaTimeModule())
 
         val messages = loadMessageHistory(assistantRequest)
         val prompt = messages.map { message: Message -> message.sender + ": " +  message.body }
@@ -65,7 +64,7 @@ class AssistantServiceImpl(
                 "this " +
                 "conversation $prompt")
 
-        println(result)
+        println("Result [$result]")
 
         val reminderItemList = objectMapper.readValue<List<ReminderItem>>(result!!)
 
@@ -78,12 +77,42 @@ class AssistantServiceImpl(
             1,
             assistantRequest.startTime,
             assistantRequest.endTime,
-            if (reminderItemList.isEmpty()) listOf(ReminderItem(LocalDateTime.now(), result)) else emptyList()
+            reminderItemList.ifEmpty { emptyList() }
         )
     }
 
     override fun generateTodos(assistantRequest: AssistantRequest): Todos {
-        TODO("Not yet implemented")
+        val participants: List<String>? = if (assistantRequest.isGroup) {
+            groupChatService.get(assistantRequest.chatId)?.groupParticipants?.map { it.participant!! }
+        } else privateChatService.getParticipants(assistantRequest.chatId)?.map { it.username!! }
+
+        val objectMapper = jacksonObjectMapper()
+
+        val messages = loadMessageHistory(assistantRequest)
+        val prompt = messages.map { message: Message -> message.sender + ": " +  message.body }
+            .joinToString(separator = "\n")
+
+        println(prompt)
+
+        val result = geminiService.chat("Retrieve todo items in following format or array $PROMPT_TODOS result is just json, nothing else out of " +
+                "this " +
+                "conversation $prompt")
+
+        println("Result [$result]")
+
+        val todos = objectMapper.readValue<List<Todo>>(result!!)
+
+        return Todos(
+            if (assistantRequest.isGroup) null else assistantRequest.chatId,
+            if (assistantRequest.isGroup) assistantRequest.chatId else null,
+            participants,
+            null,
+            LocalDateTime.now(),
+            1,
+            assistantRequest.startTime,
+            assistantRequest.endTime,
+            todos.ifEmpty { emptyList() }
+        )
     }
 
     private fun loadMessageHistory(assistantRequest: AssistantRequest): List<Message> {
@@ -103,7 +132,7 @@ class AssistantServiceImpl(
     }
 
     companion object {
-        val PROMPT_FOR_REMINDER = "remindAt:2024-06-03T08:00:00,description:Reminder description"
+        val PROMPT_FOR_REMINDER = "remindAt:2024-06-03T08:00:00,description:final run-through at 3 PM today"
 
         val PROMPT_TODOS = """
               "executor": "John",

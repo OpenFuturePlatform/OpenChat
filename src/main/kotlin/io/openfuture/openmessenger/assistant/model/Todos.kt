@@ -3,10 +3,10 @@ package io.openfuture.openmessenger.assistant.model
 import java.time.LocalDateTime
 
 data class Todos(
-    override val chatId: Int,
-    override val groupChatId: Int,
+    override val chatId: Int?,
+    override val groupChatId: Int?,
     override val members: List<String>?,
-    override val recipient: String,
+    override val recipient: String?,
     override val generatedAt: LocalDateTime,
     override val version: Int,
     override val startTime: LocalDateTime,
