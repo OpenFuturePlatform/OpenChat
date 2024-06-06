@@ -39,7 +39,7 @@ class AttachmentRepository(
             AttachmentResponse(
                 rs.getInt("id"),
                 rs.getString("name"),
-                rs.getString("url")
+                ""
             )
         }
 

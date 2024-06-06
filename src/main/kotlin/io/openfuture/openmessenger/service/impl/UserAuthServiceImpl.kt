@@ -78,6 +78,10 @@ class UserAuthServiceImpl(
     override fun createUser(signUpDTO: UserSignUpRequest) {
         cognitoUserService.signUp(signUpDTO)
         val user = User(signUpDTO.email, signUpDTO.firstName, signUpDTO.lastName)
+        user.email = signUpDTO.email
+        user.firstName = signUpDTO.firstName
+        user.lastName = signUpDTO.lastName
+        println("request: $signUpDTO and user: $user")
         userJpaRepository.save(user)
     }
 
