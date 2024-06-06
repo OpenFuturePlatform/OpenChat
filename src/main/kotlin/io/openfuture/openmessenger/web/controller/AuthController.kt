@@ -57,11 +57,6 @@ class AuthController(val userAuthService: UserAuthService) {
         )
     }
 
-    @GetMapping("/current")
-    fun current(@AuthenticationPrincipal username: String?): ResponseEntity<String> {
-        return ResponseEntity(username, HttpStatus.OK)
-    }
-
     @GetMapping("/user")
     fun userDetails(): UserResponse? {
         return userAuthService.current()

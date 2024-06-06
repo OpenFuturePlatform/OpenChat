@@ -1,6 +1,7 @@
 package io.openfuture.openmessenger.web.controller
 
 import io.openfuture.openmessenger.service.MessageService
+import io.openfuture.openmessenger.service.UserAuthService
 import io.openfuture.openmessenger.web.request.GroupMessageRequest
 import io.openfuture.openmessenger.web.request.MessageRequest
 import io.openfuture.openmessenger.web.request.MessageToAssistantRequest
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/messages")
 @RestController
 class MessageController(
-    val messageService: MessageService
+    val messageService: MessageService,
+    val userAuthService: UserAuthService
 ) {
 
     @GetMapping(value = ["/recipient/{username}"])
@@ -44,8 +46,9 @@ class MessageController(
     }
 
     @GetMapping(value = ["/front-messages"])
-    fun getFrontMessages(@RequestParam(value = "user") username: String): List<LastMessage?>? {
-        return messageService.getLastMessagesByRecipient(username)
+    fun getFrontMessages(): List<LastMessage?>? {
+        val current: String? = userAuthService.current().email
+        return messageService.getLastMessagesByRecipient(current!!)
     }
 
     @GetMapping(value = ["/chat/{chatId}"])

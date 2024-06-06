@@ -1,6 +1,5 @@
 package io.openfuture.openmessenger.service.impl
 
-import aj.org.objectweb.asm.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.openfuture.openmessenger.assistant.gemini.GeminiService
@@ -10,53 +9,53 @@ import io.openfuture.openmessenger.assistant.model.ReminderItem
 import io.openfuture.openmessenger.assistant.model.Todos
 import io.openfuture.openmessenger.repository.MessageJdbcRepository
 import io.openfuture.openmessenger.repository.entity.Message
-import io.openfuture.openmessenger.service.AiProcessor
+import io.openfuture.openmessenger.service.AssistantService
 import io.openfuture.openmessenger.service.GroupChatService
 import io.openfuture.openmessenger.service.PrivateChatService
-import io.openfuture.openmessenger.service.dto.AiRequest
+import io.openfuture.openmessenger.service.dto.AssistantRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class AiProcessorImpl(
+class AssistantServiceImpl(
     val geminiService: GeminiService,
     val groupChatService: GroupChatService,
     val privateChatService: PrivateChatService,
     val messageJdbcRepository: MessageJdbcRepository
-) : AiProcessor {
+) : AssistantService {
 
-    override fun generateNotes(aiRequest: AiRequest): ConversationNotes? {
-        val participants: List<String>? = if (aiRequest.isGroup) {
-            groupChatService.get(aiRequest.chatId)?.groupParticipants?.map { it.participant!! }
-        } else privateChatService.getParticipants(aiRequest.chatId)?.map { it.username!! }
+    override fun generateNotes(assistantRequest: AssistantRequest): ConversationNotes? {
+        val participants: List<String>? = if (assistantRequest.isGroup) {
+            groupChatService.get(assistantRequest.chatId)?.groupParticipants?.map { it.participant!! }
+        } else privateChatService.getParticipants(assistantRequest.chatId)?.map { it.username!! }
 
-        val messages = loadMessageHistory(aiRequest)
+        val messages = loadMessageHistory(assistantRequest)
         val prompt = messages.map { message: Message -> message.sender + ": " +  message.body }
             .joinToString(separator = "\n")
 
         val result = geminiService.chat("Retrieve a short key notes separated with * from a following conversation s$prompt")
         return ConversationNotes(
-            if (aiRequest.isGroup) null else aiRequest.chatId,
-            if (aiRequest.isGroup) aiRequest.chatId else null,
+            if (assistantRequest.isGroup) null else assistantRequest.chatId,
+            if (assistantRequest.isGroup) assistantRequest.chatId else null,
             participants,
             null,
             LocalDateTime.now(),
             1,
-            aiRequest.startTime,
-            aiRequest.endTime,
+            assistantRequest.startTime,
+            assistantRequest.endTime,
             result!!.split("*")
         )
     }
 
-    override fun generateReminder(aiRequest: AiRequest): Reminder {
-        val participants: List<String>? = if (aiRequest.isGroup) {
-            groupChatService.get(aiRequest.chatId)?.groupParticipants?.map { it.participant!! }
-        } else privateChatService.getParticipants(aiRequest.chatId)?.map { it.username!! }
+    override fun generateReminder(assistantRequest: AssistantRequest): Reminder {
+        val participants: List<String>? = if (assistantRequest.isGroup) {
+            groupChatService.get(assistantRequest.chatId)?.groupParticipants?.map { it.participant!! }
+        } else privateChatService.getParticipants(assistantRequest.chatId)?.map { it.username!! }
 
         val objectMapper = jacksonObjectMapper()
 
-        val messages = loadMessageHistory(aiRequest)
+        val messages = loadMessageHistory(assistantRequest)
         val prompt = messages.map { message: Message -> message.sender + ": " +  message.body }
             .joinToString(separator = "\n")
 
@@ -71,30 +70,34 @@ class AiProcessorImpl(
         val reminderItemList = objectMapper.readValue<List<ReminderItem>>(result!!)
 
         return Reminder(
-            if (aiRequest.isGroup) null else aiRequest.chatId,
-            if (aiRequest.isGroup) aiRequest.chatId else null,
+            if (assistantRequest.isGroup) null else assistantRequest.chatId,
+            if (assistantRequest.isGroup) assistantRequest.chatId else null,
             participants,
             null,
             LocalDateTime.now(),
             1,
-            aiRequest.startTime,
-            aiRequest.endTime,
+            assistantRequest.startTime,
+            assistantRequest.endTime,
             if (reminderItemList.isEmpty()) listOf(ReminderItem(LocalDateTime.now(), result)) else emptyList()
         )
     }
 
-    private fun loadMessageHistory(aiRequest: AiRequest): List<Message> {
-        return if (aiRequest.isGroup) {
+    override fun generateTodos(assistantRequest: AssistantRequest): Todos {
+        TODO("Not yet implemented")
+    }
+
+    private fun loadMessageHistory(assistantRequest: AssistantRequest): List<Message> {
+        return if (assistantRequest.isGroup) {
             messageJdbcRepository.findByGroupChatIdAndSentAtBetween(
-                aiRequest.chatId,
-                LocalDateTime.from(aiRequest.startTime),
-                LocalDateTime.from(aiRequest.endTime),
+                assistantRequest.chatId,
+                LocalDateTime.from(assistantRequest.startTime),
+                LocalDateTime.from(assistantRequest.endTime),
                 Sort.by("sentAt").ascending()
             )
         } else messageJdbcRepository.findByPrivateChatIdAndSentAtBetween(
-            aiRequest.chatId,
-            LocalDateTime.from(aiRequest.startTime),
-            LocalDateTime.from(aiRequest.endTime),
+            assistantRequest.chatId,
+            LocalDateTime.from(assistantRequest.startTime),
+            LocalDateTime.from(assistantRequest.endTime),
             Sort.by("sentAt").ascending()
         )
     }
