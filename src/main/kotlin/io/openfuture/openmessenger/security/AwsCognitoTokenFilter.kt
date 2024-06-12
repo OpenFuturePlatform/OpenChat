@@ -20,7 +20,8 @@ class AwsCognitoTokenFilter(
     defaultFilterProcessesUrl: String?,
     authenticationManager: AuthenticationManager?,
     loginUrl: String?,
-    signupUrl: String?
+    signupUrl: String?,
+    attachmentDownloadUrl: String?
 ) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
     companion object{
         private val log = LoggerFactory.getLogger(AwsCognitoTokenFilter::class.java)
@@ -28,13 +29,14 @@ class AwsCognitoTokenFilter(
 
     private val loginRequestMatcher: RequestMatcher = AntPathRequestMatcher(loginUrl)
     private val signupRequestMatcher: RequestMatcher = AntPathRequestMatcher(signupUrl)
+    private val attachmentDownloadRequestMatcher: RequestMatcher = AntPathRequestMatcher(attachmentDownloadUrl)
 
     init {
         setAuthenticationManager(authenticationManager)
     }
 
     override fun requiresAuthentication(request: HttpServletRequest, response: HttpServletResponse): Boolean {
-        return !loginRequestMatcher.matches(request) && !signupRequestMatcher.matches(request)
+        return !loginRequestMatcher.matches(request) && !signupRequestMatcher.matches(request) && !attachmentDownloadRequestMatcher.matches(request)
     }
 
     @Throws(AuthenticationException::class, IOException::class, ServletException::class)
