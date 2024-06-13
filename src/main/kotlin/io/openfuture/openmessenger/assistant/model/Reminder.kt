@@ -16,6 +16,6 @@ data class Reminder(
 ): BaseModel
 
 data class ReminderItem(
-    val remindAt: LocalDateTime,
-    val description: String
+    val remindAt: LocalDateTime?,
+    val description: String?
 )

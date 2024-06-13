@@ -16,8 +16,8 @@ data class Todos(
 ): BaseModel
 
 data class Todo(
-    val executor: String,
-    val description: String,
-    val dueDate: LocalDateTime,
-    val context: String
+    val executor: String?,
+    val description: String?,
+    val dueDate: LocalDateTime?,
+    val context: String?
 )

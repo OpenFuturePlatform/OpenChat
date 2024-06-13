@@ -55,14 +55,10 @@ class AssistantServiceImpl(
         objectMapper.registerModule(JavaTimeModule())
 
         val messages = loadMessageHistory(assistantRequest)
-        val prompt = messages.map { message: Message -> message.sender + ": " +  message.body }
-            .joinToString(separator = "\n")
+        val conversation = messages.map { message: Message -> message.sender + ": " +  message.body }
+            .joinToString(separator = ";")
 
-        println(prompt)
-
-        val result = geminiService.chat("Retrieve any task that should be reminded in following format or array $PROMPT_FOR_REMINDER result is just json, nothing else out of " +
-                "this " +
-                "conversation $prompt")
+        val result = geminiService.chat("$PROMPT_FOR_REMINDER. Conversation starts here. $conversation")
 
         println("Result [$result]")
 
@@ -89,14 +85,12 @@ class AssistantServiceImpl(
         val objectMapper = jacksonObjectMapper()
 
         val messages = loadMessageHistory(assistantRequest)
-        val prompt = messages.map { message: Message -> message.sender + ": " +  message.body }
-            .joinToString(separator = "\n")
+        val conversation = messages.map { message: Message -> message.sender + ": " +  message.body }
+            .joinToString(separator = ";")
 
-        println(prompt)
+        println(conversation)
 
-        val result = geminiService.chat("Retrieve todo items in following format or array $PROMPT_TODOS result is just json, nothing else out of " +
-                "this " +
-                "conversation $prompt")
+        val result = geminiService.chat("$PROMPT_TODOS. Conversation starts here. $conversation")
 
         println("Result [$result]")
 
@@ -132,14 +126,21 @@ class AssistantServiceImpl(
     }
 
     companion object {
-        val PROMPT_FOR_REMINDER = "remindAt:2024-06-03T08:00:00,description:final run-through at 3 PM today"
-
-        val PROMPT_TODOS = """
-              "executor": "John",
-              "description": "Complete the project proposal",
-              "dueDate": "2024-06-03T17:00:00",
-              "context": "Discussion at 2 PM"
-        """.trimIndent()
+        const val PROMPT_FOR_REMINDER = "Here is a conversation wrapped on quotes. " +
+                "Please read and analyze if there are any reminders for participants. " +
+                "In case there was mentioned anything important to be reminded about or some arrangement between participant " +
+                "give me only and json output, in case multiple items, result is array, no other text with following format {\\\"remindAt\\\": \\\"exactDate time in ISO " +
+                "8601\\\", " +
+                "\\\"description\\\": \\\"description about topic that have a place at remindAt field\\\"}"
+        const val PROMPT_TODOS = "Here is a conversation wrapped on quotes. " +
+                "Please read and analyze if there are any tasks for participants. " +
+                "In case there was mentioned anything important to be done or some assignment from someone " +
+                "give me only and json output, in case multiple items, result is array, no other text with following format " +
+                "{\\\"dueDate\\\": \\\"due date time for task in ISO 8601\\\", " +
+                "\\\"description\\\": \\\"description about the task\\\"" +
+                "\\\"executor\\\": \\\"who is assignee\\\"" +
+                "\\\"context\\\": \\\"in which context task was raised\\\"" +
+                "}"
     }
 
 }

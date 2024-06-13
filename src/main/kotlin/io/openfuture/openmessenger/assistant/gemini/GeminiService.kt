@@ -30,7 +30,7 @@ class GeminiService (
                 ]
             }
         """.trimIndent()
-//        val jsonPayload = String.format("{\"contents\":[{\"role\": \"user\", \"parts\":[{\"text\": \"%s\"}]}]}", input)
+
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         val requestEntity = HttpEntity(jsonPayload, headers)

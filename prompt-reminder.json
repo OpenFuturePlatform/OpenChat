@@ -1,0 +1,14 @@
+[
+  {
+    "remindAt": "2023-05-12T14:00:00Z",
+    "description": "alice@gmail.com and bob@gmail.com: Sync up at 2 PM to discuss progress"
+  },
+  {
+    "remindAt": "2023-05-12T15:00:00Z",
+    "description": "alice@gmail.com and bob@gmail.com: Final run-through for presentation"
+  },
+  {
+    "remindAt": null,
+    "description": "alice@gmail.com and bob@gmail.com: Finalize budget by Friday"
+  }
+]
