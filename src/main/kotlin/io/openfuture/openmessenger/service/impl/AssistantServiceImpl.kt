@@ -1,13 +1,16 @@
 package io.openfuture.openmessenger.service.impl
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.openfuture.openmessenger.assistant.gemini.GeminiService
 import io.openfuture.openmessenger.assistant.model.*
 import io.openfuture.openmessenger.repository.MessageJdbcRepository
 import io.openfuture.openmessenger.repository.NoteRepository
+import io.openfuture.openmessenger.repository.ReminderRepository
+import io.openfuture.openmessenger.repository.TodoRepository
 import io.openfuture.openmessenger.repository.entity.AssistantNoteEntity
+import io.openfuture.openmessenger.repository.entity.AssistantReminderEntity
+import io.openfuture.openmessenger.repository.entity.AssistantTodoEntity
 import io.openfuture.openmessenger.repository.entity.Message
 import io.openfuture.openmessenger.service.AssistantService
 import io.openfuture.openmessenger.service.GroupChatService
@@ -15,6 +18,8 @@ import io.openfuture.openmessenger.service.PrivateChatService
 import io.openfuture.openmessenger.service.UserAuthService
 import io.openfuture.openmessenger.service.dto.AssistantRequest
 import io.openfuture.openmessenger.service.dto.GetAllNotesRequest
+import io.openfuture.openmessenger.service.dto.GetAllRemindersRequest
+import io.openfuture.openmessenger.service.dto.GetAllTodosRequest
 import io.openfuture.openmessenger.service.response.UserResponse
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -28,6 +33,8 @@ class AssistantServiceImpl(
     val messageJdbcRepository: MessageJdbcRepository,
     val userAuthService: UserAuthService,
     val noteRepository: NoteRepository,
+    val todoRepository: TodoRepository,
+    val reminderRepository: ReminderRepository
 ) : AssistantService {
 
     override fun generateNotes(assistantRequest: AssistantRequest): ConversationNotes? {
@@ -81,15 +88,34 @@ class AssistantServiceImpl(
         val participants: List<String>? = getParticipants(assistantRequest)
 
         val objectMapper = jacksonObjectMapper()
-        objectMapper.registerModule(JavaTimeModule())
 
         val conversation = getConversation(assistantRequest)
 
-        val result = geminiService.chat("${PROMPT_FOR_REMINDER.format("alice@gmail.com")}. Conversation starts here. $conversation")
+        var result = geminiService.chat("${PROMPT_FOR_REMINDER.format(current.email)}. Conversation starts here. $conversation")
 
         println("Result [$result]")
 
-        val reminderItemList = objectMapper.readValue<List<ReminderItem>>(result!!)
+        result = result
+            ?.replace("[", "")
+            ?.replace("]", "")
+            ?.replace("```json", "")
+            ?.replace("```", "")
+
+        val reminderItemList = objectMapper.readValue<List<ReminderItem>>("[$result]")
+
+        val assistantReminderEntity = AssistantReminderEntity(
+            current.email,
+            if (assistantRequest.isGroup) null else assistantRequest.chatId,
+            if (assistantRequest.isGroup) assistantRequest.chatId else null,
+            objectMapper.writeValueAsString(participants),
+            getRecipient(current, assistantRequest),
+            LocalDateTime.now(),
+            1,
+            assistantRequest.startTime,
+            assistantRequest.endTime,
+            objectMapper.writeValueAsString(reminderItemList)
+        )
+        reminderRepository.save(assistantReminderEntity)
 
         return Reminder(
             if (assistantRequest.isGroup) null else assistantRequest.chatId,
@@ -114,11 +140,30 @@ class AssistantServiceImpl(
 
         println(conversation)
 
-        val result = geminiService.chat("${PROMPT_TODOS.format("alice@gmail.com")}. Conversation starts here. $conversation")
+        var result = geminiService.chat("${PROMPT_TODOS.format(current.email)}. Conversation starts here. $conversation")
 
         println("Result [$result]")
 
-        val todos = objectMapper.readValue<List<Todo>>(result!!)
+        result = result
+            ?.replace("[", "")
+            ?.replace("]", "")
+            ?.replace("```json", "")
+            ?.replace("```", "")
+        val todos = objectMapper.readValue<List<Todo>>("[$result]")
+
+        val assistantTodoEntity = AssistantTodoEntity(
+            current.email,
+            if (assistantRequest.isGroup) null else assistantRequest.chatId,
+            if (assistantRequest.isGroup) assistantRequest.chatId else null,
+            objectMapper.writeValueAsString(participants),
+            getRecipient(current, assistantRequest),
+            LocalDateTime.now(),
+            1,
+            assistantRequest.startTime,
+            assistantRequest.endTime,
+            objectMapper.writeValueAsString(todos)
+        )
+        todoRepository.save(assistantTodoEntity)
 
         return Todos(
             if (assistantRequest.isGroup) null else assistantRequest.chatId,
@@ -141,7 +186,29 @@ class AssistantServiceImpl(
             noteRepository.findAllByAuthorAndChatId(current.email!!, getAllNotesRequest.chatId)
         }
 
-        return  notes.map { convertFromEntity(it) }
+        return notes.map { convertFromEntity(it) }
+    }
+
+    override fun getAllTodos(getAllTodosRequest: GetAllTodosRequest): List<Todos> {
+        val current = userAuthService.current()
+        val todos: List<AssistantTodoEntity> = if (getAllTodosRequest.isGroup) {
+            todoRepository.findAllByAuthorAndGroupChatId(current.email!!, getAllTodosRequest.chatId)
+        } else {
+            todoRepository.findAllByAuthorAndChatId(current.email!!, getAllTodosRequest.chatId)
+        }
+
+        return todos.map { convertFromEntity(it) }
+    }
+
+    override fun getAllReminders(getAllRemindersRequest: GetAllRemindersRequest): List<Reminder> {
+        val current = userAuthService.current()
+        val reminders: List<AssistantReminderEntity> = if (getAllRemindersRequest.isGroup) {
+            reminderRepository.findAllByAuthorAndGroupChatId(current.email!!, getAllRemindersRequest.chatId)
+        } else {
+            reminderRepository.findAllByAuthorAndChatId(current.email!!, getAllRemindersRequest.chatId)
+        }
+
+        return reminders.map { convertFromEntity(it) }
     }
 
     private fun getConversation(assistantRequest: AssistantRequest): String {
@@ -187,9 +254,9 @@ class AssistantServiceImpl(
                 "give me only and json output, in case multiple items, result is array, no other text with following format " +
                 "{\\\"dueDate\\\": \\\"due date time for task in ISO 8601\\\", " +
                 "\\\"description\\\": \\\"description about the task\\\"" +
-                "\\\"executor\\\": \\\"who is assignee\\\"" +
+                "\\\"executor\\\": \\\"if participant is executor, put him here otherwise skip this task\\\"" +
                 "\\\"context\\\": \\\"in which context task was raised\\\"" +
-                "}"
+                "}. In case if dueDate is unknown and can't be extracted, put there null."
     }
 
     private fun convertFromEntity(entity: AssistantNoteEntity): ConversationNotes {
@@ -207,6 +274,42 @@ class AssistantServiceImpl(
             startTime = entity.startTime ?: LocalDateTime.now(),
             endTime = entity.endTime ?: LocalDateTime.now(),
             notes = notesList
+        )
+    }
+
+    private fun convertFromEntity(entity: AssistantTodoEntity): Todos {
+        val objectMapper = jacksonObjectMapper()
+        val membersList: List<String> = entity.members?.let { objectMapper.readValue(it) } ?: emptyList()
+        val todoList: List<Todo> = entity.todos?.let { objectMapper.readValue(it) } ?: emptyList()
+
+        return Todos(
+            chatId = entity.chatId,
+            groupChatId = entity.groupChatId,
+            members = membersList,
+            recipient = entity.recipient,
+            generatedAt = entity.generatedAt,
+            version = entity.version,
+            startTime = entity.startTime ?: LocalDateTime.now(),
+            endTime = entity.endTime ?: LocalDateTime.now(),
+            todos = todoList
+        )
+    }
+
+    private fun convertFromEntity(entity: AssistantReminderEntity): Reminder {
+        val objectMapper = jacksonObjectMapper()
+        val membersList: List<String> = entity.members?.let { objectMapper.readValue(it) } ?: emptyList()
+        val reminderList: List<ReminderItem> = entity.reminders?.let { objectMapper.readValue(it) } ?: emptyList()
+
+        return Reminder(
+            chatId = entity.chatId,
+            groupChatId = entity.groupChatId,
+            members = membersList,
+            recipient = entity.recipient,
+            generatedAt = entity.generatedAt,
+            version = entity.version,
+            startTime = entity.startTime ?: LocalDateTime.now(),
+            endTime = entity.endTime ?: LocalDateTime.now(),
+            reminders = reminderList
         )
     }
 

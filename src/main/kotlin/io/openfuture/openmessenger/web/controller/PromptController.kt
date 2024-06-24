@@ -6,7 +6,12 @@ import io.openfuture.openmessenger.assistant.model.Todos
 import io.openfuture.openmessenger.service.AssistantService
 import io.openfuture.openmessenger.service.dto.AssistantRequest
 import io.openfuture.openmessenger.service.dto.GetAllNotesRequest
-import org.springframework.web.bind.annotation.*
+import io.openfuture.openmessenger.service.dto.GetAllRemindersRequest
+import io.openfuture.openmessenger.service.dto.GetAllTodosRequest
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RequestMapping("/api/v1/ai")
 @RestController
@@ -38,6 +43,16 @@ class PromptController(
     @PostMapping("/notes")
     fun getAllNotes(@RequestBody request: GetAllNotesRequest): List<ConversationNotes> {
         return assistantService.getAllNotes(request)
+    }
+
+    @PostMapping("/todos")
+    fun getAllTodos(@RequestBody request: GetAllTodosRequest): List<Todos> {
+        return assistantService.getAllTodos(request)
+    }
+
+    @PostMapping("/reminders")
+    fun getAllReminders(@RequestBody request: GetAllRemindersRequest): List<Reminder> {
+        return assistantService.getAllReminders(request)
     }
 
 }
