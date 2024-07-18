@@ -42,17 +42,17 @@ class PromptController(
 
     @PostMapping("/notes")
     fun getAllNotes(@RequestBody request: GetAllNotesRequest): List<ConversationNotes> {
-        return assistantService.getAllNotes(request)
+        return assistantService.getAllNotes(request).sortedByDescending { it.generatedAt }
     }
 
     @PostMapping("/todos")
     fun getAllTodos(@RequestBody request: GetAllTodosRequest): List<Todos> {
-        return assistantService.getAllTodos(request)
+        return assistantService.getAllTodos(request).sortedByDescending { it.generatedAt }
     }
 
     @PostMapping("/reminders")
     fun getAllReminders(@RequestBody request: GetAllRemindersRequest): List<Reminder> {
-        return assistantService.getAllReminders(request)
+        return assistantService.getAllReminders(request).sortedByDescending { it.generatedAt }
     }
 
 }

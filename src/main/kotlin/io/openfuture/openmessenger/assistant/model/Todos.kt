@@ -18,6 +18,6 @@ data class Todos(
 data class Todo(
     val executor: String?,
     val description: String?,
-    val dueDate: LocalDateTime?,
+    val dueDate: String?,
     val context: String?
 )
