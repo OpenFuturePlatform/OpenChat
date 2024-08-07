@@ -21,11 +21,16 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://maven.dcm4che.org"
+    }
 }
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0"
 
     implementation 'io.jsonwebtoken:jjwt:0.12.5'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
@@ -52,11 +57,16 @@ dependencies {
 
     implementation("com.amazonaws:aws-java-sdk-cognitoidp:1.12.681")
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.687'
+    implementation 'com.amazonaws:aws-java-sdk-transcribe:1.12.761'
+    implementation 'software.amazon.awssdk:transcribestreaming:2.26.20'
+
     implementation("javax.validation:validation-api:2.0.1.Final")
 
     implementation 'com.amazonaws:aws-java-sdk-qconnect:1.12.693'
 
+    implementation 'xuggle:xuggle-xuggler:5.4'
     implementation("org.passay:passay:1.6.3")
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
