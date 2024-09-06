@@ -10,14 +10,10 @@ import java.time.LocalDateTime.now
 class WalletEntity() {
     constructor(
         address: String?,
-        privateKey: String?,
         blockchainType: BlockchainType,
-        seedPhrases: String?,
         userId: String?
     ): this() {
         this.address = address
-        this.privateKey = privateKey
-        this.seedPhrases = seedPhrases
         this.userId = userId
         this.blockchainType = blockchainType
         this.createdAt = now()
@@ -30,9 +26,8 @@ class WalletEntity() {
     var createdAt: LocalDateTime? = now()
     var updatedAt: LocalDateTime? = now()
     var address: String? = null
-    var privateKey: String? = null
     @Enumerated(EnumType.STRING)
     var blockchainType: BlockchainType = BlockchainType.BTC
-    var seedPhrases: String? = null
+    var balance: String? = null
     var userId: String? = null
 }

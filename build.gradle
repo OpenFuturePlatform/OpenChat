@@ -66,12 +66,8 @@ dependencies {
 
     testImplementation 'org.testcontainers:postgresql:1.19.7'
 
-    // Web3j
-    implementation("org.web3j:core:5.0.0")
-    // Bitcoinj
-    implementation("org.bitcoinj:bitcoinj-core:0.16.1")
-    // Bip39 Mnemonic generator
-    implementation("io.github.novacrypto:BIP39:2019.01.27")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 
 }
 

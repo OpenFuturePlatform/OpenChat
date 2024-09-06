@@ -32,6 +32,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers("/api/v1/public/login").permitAll()
                 it.requestMatchers("/api/v1/public/signup").permitAll()
+                it.requestMatchers("/api/v1/wallets/webhook").permitAll()
                 it.requestMatchers("/api/v1/attachments/download/**").permitAll()
                 //.requestMatchers("/**").permitAll()
                 it.anyRequest().authenticated()

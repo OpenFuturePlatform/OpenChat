@@ -2,7 +2,8 @@ package io.openfuture.openmessenger.service.dto
 
 import io.openfuture.openmessenger.repository.entity.BlockchainType
 
-data class CreateWalletRequest(
+data class SaveWalletRequest(
     var blockchainType: BlockchainType,
-    var password: String
+    var address: String,
+    var userId: String
 )
