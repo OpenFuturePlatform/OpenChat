@@ -9,9 +9,9 @@ import java.time.LocalDateTime.now
 @Table(name = "open_wallets")
 class WalletEntity() {
     constructor(
-        address: String?,
+        address: String,
         blockchainType: BlockchainType,
-        userId: String?
+        userId: String
     ): this() {
         this.address = address
         this.userId = userId

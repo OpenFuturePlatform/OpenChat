@@ -6,10 +6,9 @@ import io.openfuture.openmessenger.service.PushNotificationService
 import io.openfuture.openmessenger.service.UserAuthService
 import io.openfuture.openmessenger.service.WalletManagementService
 import io.openfuture.openmessenger.service.dto.SaveWalletRequest
-import io.openfuture.openmessenger.service.dto.DecryptWalletRequest
 import io.openfuture.openmessenger.service.dto.PushNotificationRequest
+import io.openfuture.openmessenger.service.dto.WebhookPayloadDto
 import io.openfuture.openmessenger.service.response.WalletResponse
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/api/v1/wallets")
@@ -33,17 +32,15 @@ class WalletController(
         return wallet
     }
 
-    /*@PostMapping("/webhook")
+    @PostMapping("/webhook")
     fun processWebHook(
-        @RequestBody webhookResponse: WebhookResponse
+        @RequestBody webhookPayloadDto: WebhookPayloadDto
     ) {
-        val pushNotificationRequest = PushNotificationRequest("test", "message", "topic", webhookResponse.message)
-        println("WebHook response $webhookResponse")
-        pushNotificationService.sendPushNotificationToToken(pushNotificationRequest)
-    }*/
+        walletManagementService.processWebHook(webhookPayloadDto)
+    }
 
     @PostMapping("/notification")
-    fun processWebHook(
+    fun processNotification(
         @RequestBody notificationCreate: NotificationCreate
     ) {
         val tokens = userFirebaseTokenRepository.findAllByUserId(notificationCreate.userId)
@@ -58,12 +55,6 @@ class WalletController(
         val currentUser = userAuthService.current()
         return walletManagementService.getByUserId(currentUser.email!!)
     }
-
-    data class WebhookResponse(
-        val status: HttpStatus,
-        val url: String,
-        val message: String?
-    )
 
     data class NotificationCreate(
         val userId: String,

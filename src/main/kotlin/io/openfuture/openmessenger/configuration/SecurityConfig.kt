@@ -43,6 +43,7 @@ class SecurityConfig(
                     authenticationManager,
                     "/api/v1/public/login",
                     "/api/v1/public/signup",
+                    "/api/v1/wallets/webhook",
                     "/api/v1/attachments/download/**"
                 ),
                 UsernamePasswordAuthenticationFilter::class.java

@@ -23,6 +23,7 @@ class UserFirebaseTokenController(
     fun addToken(
         @RequestBody request: FirebaseTokenRequest,
     ): UserFireBaseToken? {
+        println("Save FCM token request $request")
         val userFireBaseToken = UserFireBaseToken(request.userId, request.token)
         if (!userFirebaseTokenRepository.existsByUserIdAndFirebaseToken(request.userId, request.token)) {
             return userFirebaseTokenRepository.save(userFireBaseToken)
