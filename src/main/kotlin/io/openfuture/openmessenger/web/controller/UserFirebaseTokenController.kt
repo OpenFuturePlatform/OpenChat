@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/v1/token")
@@ -25,9 +26,15 @@ class UserFirebaseTokenController(
     ): UserFireBaseToken? {
         println("Save FCM token request $request")
         val userFireBaseToken = UserFireBaseToken(request.userId, request.token)
-        if (!userFirebaseTokenRepository.existsByUserIdAndFirebaseToken(request.userId, request.token)) {
-            return userFirebaseTokenRepository.save(userFireBaseToken)
+        val fireBaseToken = userFirebaseTokenRepository.findFirstByUserId(request.userId)
+        return if (fireBaseToken.isPresent) {
+            fireBaseToken.get().apply {
+                firebaseToken = request.token
+                updatedAt = LocalDateTime.now()
+            }.let { userFirebaseTokenRepository.save(it) }
+        } else {
+            userFirebaseTokenRepository.save(userFireBaseToken)
         }
-        throw RuntimeException("token already exists")
+
     }
 }

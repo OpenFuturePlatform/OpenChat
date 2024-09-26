@@ -1,7 +1,9 @@
 package io.openfuture.openmessenger.web.controller
 
 import io.openfuture.openmessenger.component.state.DefaultStateApi
+import io.openfuture.openmessenger.repository.BlockchainContractRepository
 import io.openfuture.openmessenger.repository.UserFirebaseTokenRepository
+import io.openfuture.openmessenger.repository.entity.BlockchainType
 import io.openfuture.openmessenger.service.PushNotificationService
 import io.openfuture.openmessenger.service.UserAuthService
 import io.openfuture.openmessenger.service.WalletManagementService
@@ -18,7 +20,8 @@ class WalletController(
     val stateApi: DefaultStateApi,
     val walletManagementService: WalletManagementService,
     val pushNotificationService: PushNotificationService,
-    val userFirebaseTokenRepository: UserFirebaseTokenRepository
+    val userFirebaseTokenRepository: UserFirebaseTokenRepository,
+    val blockchainContractRepository: BlockchainContractRepository
 ) {
 
     @PostMapping("/save")
@@ -27,7 +30,12 @@ class WalletController(
     ): WalletResponse {
         val currentUser = userAuthService.current()
         val wallet = walletManagementService.saveWallet(request, currentUser.email!!)
-        stateApi.createWallet(wallet.address!!, "http://localhost:5001/api/v1/wallets/webhook", wallet.blockchainType, "chatx")
+        stateApi.createWallet(
+            wallet.address!!,
+            "http://localhost:5001/api/v1/wallets/webhook",
+            wallet.blockchainType,
+            "chatx"
+        )
 
         return wallet
     }
@@ -45,7 +53,12 @@ class WalletController(
     ) {
         val tokens = userFirebaseTokenRepository.findAllByUserId(notificationCreate.userId)
         for (token in tokens) {
-            val pushNotificationRequest = PushNotificationRequest(notificationCreate.title, notificationCreate.message!!, "topic", token.firebaseToken)
+            val pushNotificationRequest = PushNotificationRequest(
+                notificationCreate.title,
+                notificationCreate.message!!,
+                "topic",
+                token.firebaseToken
+            )
             pushNotificationService.sendPushNotificationToToken(pushNotificationRequest)
         }
     }
@@ -56,9 +69,22 @@ class WalletController(
         return walletManagementService.getByUserId(currentUser.email!!)
     }
 
+    @GetMapping("/contracts")
+    fun getContracts(@RequestParam(defaultValue = "true") isTest: Boolean): List<ContractDto> {
+        return blockchainContractRepository.findAllByIsTest(isTest).map {
+            ContractDto(it.contractName!!, it.contractAddress!!, it.blockchain)
+        }
+    }
+
     data class NotificationCreate(
         val userId: String,
         val title: String,
         val message: String?
+    )
+
+    data class ContractDto(
+        val name: String,
+        val address: String,
+        val blockchain: BlockchainType
     )
 }
