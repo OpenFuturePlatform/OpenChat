@@ -17,8 +17,8 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 aws:
-  access-key: AKIAXYKJRLFYPXI732OX
-  secret-key: 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
+  access-key: AKIAXYKJRLFYOGZSQSGZ
+  secret-key: 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
   region: us-east-2
   attachments-bucket: open-chat-attachments
   cognito:
