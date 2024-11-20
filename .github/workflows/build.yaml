@@ -68,6 +68,10 @@ jobs:
           echo "${{ secrets.DEPLOY_KEY }}" | tr -d '\r' > ~/.ssh/private.key
           chmod 600 ~/.ssh/private.key
       - name: Run command
-        run:
+        run: |
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-          -t "docker run --name open-chat-latest -p 8080:8080 -d iceknight07/open-chat:latest"
+            "docker stop open-chat"
+          ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
+            "docker rmi iceknight07/open-chat:latest"
+          ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
+            "docker run --name open-chat -p 80:8080 rm -d iceknight07/open-chat:latest"
