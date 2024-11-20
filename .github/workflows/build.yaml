@@ -70,6 +70,11 @@ jobs:
       - name: Run command
         run: |
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker stop $(docker ps --filter "name=open-chat-postgres" -q)"
+            "docker stop $(docker ps --filter \"name=open-chat-postgres\" -q)"
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker run --name open-chat -p 80:8080 --rm -d iceknight07/open-chat:latest"
+            "docker run --name open-chat -p 80:8080 --rm -d \
+              -e POSTGRES_URL=jdbc:postgresql://localhost:5434/open_chat \
+              -e POSTGRES_USER=postgres \
+              -e POSTGRES_PASSWORD=123456 \
+              -e KMS_URL=ws://127.0.0.1:8888/kurento \
+              iceknight07/open-chat:latest"
