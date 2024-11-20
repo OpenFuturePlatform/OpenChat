@@ -1,6 +1,7 @@
 package io.openfuture.openmessenger.kurento
 
 import org.kurento.client.KurentoClient
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.socket.config.annotation.EnableWebSocket
@@ -10,7 +11,10 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 
 @Configuration
 @EnableWebSocket
-class KurentoWebsocketConfigurer : WebSocketConfigurer {
+class KurentoWebsocketConfigurer(
+    @Value("\${kms.url}")
+    val kurentoUrl: String
+) : WebSocketConfigurer {
     @Bean
     fun handler(): HelloWorldHandler {
         return HelloWorldHandler()
@@ -18,7 +22,7 @@ class KurentoWebsocketConfigurer : WebSocketConfigurer {
 
     @Bean
     fun kurentoClient(): KurentoClient {
-        return KurentoClient.create()
+        return KurentoClient.create(kurentoUrl)
     }
 
     @Bean
