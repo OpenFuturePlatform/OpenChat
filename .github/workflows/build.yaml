@@ -70,8 +70,6 @@ jobs:
       - name: Run command
         run: |
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker stop open-chat"
+            "docker stop $(docker ps --filter "name=open-chat-postgres" -q)"
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker rmi iceknight07/open-chat:latest"
-          ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker run --name open-chat -p 80:8080 rm -d iceknight07/open-chat:latest"
+            "docker run --name open-chat -p 80:8080 --rm -d iceknight07/open-chat:latest"
