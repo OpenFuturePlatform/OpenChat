@@ -40,7 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build login
-        run: docker login -u ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_PASS }}
+        run: docker login -u ${{ vars.DOCKER_USER }} -p ${{ secrets.DOCKER_PASS }}
       - name: Build docker image
         run: docker build -t iceknight07/open-chat:latest .
       - name: Push docker image
