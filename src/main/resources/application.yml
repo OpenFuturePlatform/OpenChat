@@ -3,7 +3,7 @@ spring:
     name: open-chat
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5434/open_chat
+    url: jdbc:postgresql://open-chat-postgres:5432/open_chat
     username: postgres
     password: 123456
   jpa:
@@ -43,3 +43,10 @@ gemini:
 
 system:
   GOOGLE_APPLICATION_CREDENTIALS: /Users/beksultan/Documents/open-messanger/alien-scope-428812-i2-0794e36fcbee.json
+
+#server:
+#  ssl:
+#    key-store: classpath:keystore.jks
+#    key-store-password: kurento
+#    key-store-type: JKS
+#    key-alias: kurento-selfsigned

@@ -2,6 +2,7 @@ package io.openfuture.openmessenger.configuration
 
 import io.openfuture.openmessenger.security.AwsCognitoTokenFilter
 import io.openfuture.openmessenger.security.CognitoAuthenticationProvider
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
@@ -13,6 +14,9 @@ import org.springframework.security.config.annotation.web.configurers.SessionMan
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +37,12 @@ class SecurityConfig(
                 it.requestMatchers("/api/v1/public/login").permitAll()
                 it.requestMatchers("/api/v1/public/signup").permitAll()
                 it.requestMatchers("/api/v1/attachments/download/**").permitAll()
-                //.requestMatchers("/**").permitAll()
+                it.requestMatchers("/*").permitAll()
+                it.requestMatchers("/webjars/**").permitAll()
+                it.requestMatchers("/js/*").permitAll()
+                it.requestMatchers("/img/*").permitAll()
+                it.requestMatchers("/css/*").permitAll()
+                it.requestMatchers("/video/*").permitAll()
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(
@@ -42,7 +51,8 @@ class SecurityConfig(
                     authenticationManager,
                     "/api/v1/public/login",
                     "/api/v1/public/signup",
-                    "/api/v1/attachments/download/**"
+                    "/api/v1/attachments/download/**",
+                    listOf("/*", "/webjars/**", "/js/*", "/img/*", "/css/*", "/video/*")
                 ),
                 UsernamePasswordAuthenticationFilter::class.java
             )
