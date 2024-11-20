@@ -52,7 +52,7 @@ jobs:
       - name: Build docker image
         run: docker build -t iceknight07/open-chat:latest .
       - name: Push docker image
-        run: docker push iceknight07/open-chat:latest .
+        run: docker push iceknight07/open-chat:latest
   deploy:
     needs: prepareDockerImage
     name: Deploy
@@ -70,4 +70,4 @@ jobs:
       - name: Run command
         run:
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-          -t "docker run --name open-chat -p 80:8080 -d iceknight07/open-chat:latest"
+          -t "docker run --name open-chat-latest -p 8080:8080 -d iceknight07/open-chat:latest"
