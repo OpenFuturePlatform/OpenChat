@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Call Screen</title>
+    <link rel="stylesheet" href="css/call.css">
+</head>
+<body>
+<div class="video-call-container">
+    <!-- Video Elements -->
+    <div class="video-wrapper">
+        <video id="uiLocalVideo" autoplay muted></video>
+        <video id="remoteVideo" autoplay></video>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button id="mute" class="control-btn">🎤</button>
+        <button id="camera" class="control-btn">📷</button>
+        <button id="endCall" class="control-btn end-call">🔴</button>
+    </div>
+</div>
+<script src="js/call.js"></script>
+</body>
+</html>

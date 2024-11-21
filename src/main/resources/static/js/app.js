@@ -188,10 +188,10 @@ function uiStart()
     };
 
     options.configuration = {
-        iceServers : JSON.parse('[{"urls":"stun:stun.l.google.com:19302"}]')
-        // iceServers: JSON.parse('[{"urls":"stun:stun.l.google.com:19302"}, {"urls":"turns:standard.relay.metered.ca:80", ' +
-        //     '"username":"65024e9d0265012cc6669435", ' +
-        //     '"credential":"k3nUiqAyH5SM/5qt"}]')
+        // iceServers : JSON.parse('[{"urls":"stun:stun.l.google.com:19302"}]')
+        iceServers: JSON.parse('[{"urls":"stun:stun.l.google.com:19302"}, {"urls":"turns:standard.relay.metered.ca:80", ' +
+            '"username":"65024e9d0265012cc6669435", ' +
+            '"credential":"k3nUiqAyH5SM/5qt"}]')
     };
     webRtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options,
         function(err)

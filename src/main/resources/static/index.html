@@ -16,46 +16,26 @@
     <script src="/webjars/webrtc-adapter/release/adapter.js"></script>
 
     <!-- Kurento -->
-    <link rel="stylesheet" href="/css/kurento.css">
+<!--    <link rel="stylesheet" href="/css/kurento.css">-->
+    <link rel="stylesheet" href="/css/call.css">
     <script src="/js/kurento-utils.min.js"></script> <!-- JAR from Maven -->
     <script src="/js/app.js"></script>
+    <script src="/js/call.js"></script>
 
 </head>
 
 <body>
-<header>
-<!--    <div class="navbar navbar-inverse navbar-fixed-top">-->
-<!--        <div class="container">-->
-<!--            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">-->
-<!--                <ul class="nav navbar-nav navbar-right">-->
-<!--                    <li>-->
-<!--                        <a href="https://github.com/Kurento/kurento/tree/main/tutorials/java/hello-world">-->
-<!--                            <span class="glyphicon glyphicon-file"></span>Source Code</a>-->
-<!--                    </li>-->
-<!--                </ul>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-</header>
 
-<div class="container">
-    <div class="row">
+<div class="video-call-container">
+    <div class="video-wrapper">
+        <video id="uiLocalVideo" autoplay muted></video>
+        <video id="uiRemoteVideo" autoplay></video>
+    </div>
 
-        <div class="col-md-2">
-            <a id="uiStartBtn" href="#" class="btn btn-success">
-                <span class="glyphicon glyphicon-play"></span>Start</a>
-            <br>
-            <br>
-            <a id="uiStopBtn" href="#" class="btn btn-danger">
-                <span class="glyphicon glyphicon-stop"></span>Stop</a>
-        </div>
-        <div class="col-md-5">
-            <div class='video-container'>
-                <video id="uiLocalVideo" class='userVideo' playsinline muted></video>
-                <video id="uiRemoteVideo" class='peerVideo' playsinline muted></video>
-            </div>
-        </div>
-
+    <div class="controls">
+        <button id="mute" class="control-btn">🎤</button>
+        <button id="camera" class="control-btn">📷</button>
+        <button id="endCall" class="control-btn end-call">🔴</button>
     </div>
 </div>
 
