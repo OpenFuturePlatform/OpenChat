@@ -46,9 +46,11 @@ system:
 
 kms:
   url: ws://127.0.0.1:8888/kurento
-#server:
-#  ssl:
-#    key-store: classpath:keystore.jks
-#    key-store-password: kurento
-#    key-store-type: JKS
-#    key-alias: kurento-selfsigned
+
+server:
+  ssl:
+    key-store: classpath:keystore.jks
+    key-store-password: kurento
+    key-store-type: JKS
+    key-alias: kurento-selfsigned
+  port: 8443

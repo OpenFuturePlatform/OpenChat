@@ -72,7 +72,7 @@ jobs:
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
             "docker stop $(docker ps -a --filter \"name=open-chat-server\" -q) || true"
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker run --name open-chat-server --network=open-chat-network -p 80:8080 -d \
+            "docker run --name open-chat-server --network=open-chat-network -p 443:8443 -d \
               -e POSTGRES_URL=open-chat-postgres:5432/open_chat \
               -e POSTGRES_USER=postgres \
               -e POSTGRES_PASSWORD=12345678 \
