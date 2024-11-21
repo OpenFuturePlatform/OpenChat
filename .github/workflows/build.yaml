@@ -70,11 +70,12 @@ jobs:
       - name: Run command
         run: |
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker stop $(docker ps --filter \"name=open-chat-postgres\" -q) || true"
+            "docker stop $(docker ps -a --filter \"name=open-chat-server\" -q) || true"
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker run --name open-chat -p 80:8080 --rm -d \
-              -e POSTGRES_URL=jdbc:postgresql://localhost:5434/open_chat \
+            "docker run --name open-chat-server --network=open-chat-network -p 80:8080 -d \
+              -e POSTGRES_URL=open-chat-postgres:5432/open_chat \
               -e POSTGRES_USER=postgres \
-              -e POSTGRES_PASSWORD=123456 \
-              -e KMS_URL=ws://127.0.0.1:8888/kurento \
+              -e POSTGRES_PASSWORD=12345678 \
+              -e KMS_URL=ws://kurento-media-server:8888/kurento \
+              -e SPRING_PROFILES_ACTIVE=production \
               iceknight07/open-chat:latest"

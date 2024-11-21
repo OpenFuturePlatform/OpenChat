@@ -1,4 +1,4 @@
-const ws = new WebSocket('wss://' + location.host + '/helloworld');
+const ws = new WebSocket('ws://' + location.host + '/helloworld');
 ws.onerror = (error) => {
     console.error('WebSocket error:', error);
     console.log('Detailed Error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
