@@ -70,9 +70,9 @@ jobs:
       - name: Run command
         run: |
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker stop $(docker ps --filter \"name=open-chat-server\" -q) || true"
+            "docker stop open-chat-server || true"
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
-            "docker rm $(docker ps -a --filter \"name=open-chat-server\" -q) || true"
+            "docker rm open-chat-server || true"
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
             "docker rmi iceknight07/open-chat:latest || true"
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
