@@ -1,5 +1,8 @@
 package io.openfuture.openmessenger.kurento
 
+import io.openfuture.openmessenger.kurento.groupcall.CallHandler
+import io.openfuture.openmessenger.kurento.groupcall.RoomManager
+import io.openfuture.openmessenger.kurento.groupcall.UserRegistry
 import org.kurento.client.KurentoClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -33,7 +36,23 @@ class KurentoWebsocketConfigurer(
     }
 
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
+        registry.addHandler(groupCallHandler(), "/groupcall").setAllowedOriginPatterns("*")
         registry.addHandler(handler(), "/helloworld").setAllowedOriginPatterns("*")
     }
+    @Bean
+    fun registry(): UserRegistry {
+        return UserRegistry()
+    }
+
+    @Bean
+    fun roomManager(): RoomManager {
+        return RoomManager()
+    }
+
+    @Bean
+    fun groupCallHandler(): CallHandler {
+        return CallHandler()
+    }
+
 }
 
