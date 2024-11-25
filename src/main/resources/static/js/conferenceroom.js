@@ -111,6 +111,12 @@ function onExistingParticipants(msg) {
 	      mediaConstraints: constraints,
 	      onicecandidate: participant.onIceCandidate.bind(participant)
 	    }
+	options.configuration = {
+		// iceServers : JSON.parse('[{"urls":"stun:stun.l.google.com:19302"}]')
+		iceServers: JSON.parse('[{"urls":"stun:stun.l.google.com:19302"}, {"urls":"turns:standard.relay.metered.ca:80", ' +
+			'"username":"65024e9d0265012cc6669435", ' +
+			'"credential":"k3nUiqAyH5SM/5qt"}]')
+	};
 	participant.rtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerSendonly(options,
 		function (error) {
 		  if(error) {
@@ -146,6 +152,13 @@ function receiveVideo(sender) {
       remoteVideo: video,
       onicecandidate: participant.onIceCandidate.bind(participant)
     }
+
+	options.configuration = {
+		// iceServers : JSON.parse('[{"urls":"stun:stun.l.google.com:19302"}]')
+		iceServers: JSON.parse('[{"urls":"stun:stun.l.google.com:19302"}, {"urls":"turns:standard.relay.metered.ca:80", ' +
+			'"username":"65024e9d0265012cc6669435", ' +
+			'"credential":"k3nUiqAyH5SM/5qt"}]')
+	};
 
 	participant.rtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerRecvonly(options,
 			function (error) {
