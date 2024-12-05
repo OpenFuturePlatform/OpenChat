@@ -1,5 +1,6 @@
-package io.openfuture.openmessenger.kurento.groupcall
+package io.openfuture.openmessenger.kurento
 
+import io.openfuture.openmessenger.kurento.groupcall.UserSession
 import org.springframework.web.socket.WebSocketSession
 import java.util.concurrent.ConcurrentHashMap
 
