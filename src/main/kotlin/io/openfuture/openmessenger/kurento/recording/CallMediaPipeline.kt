@@ -13,6 +13,11 @@ class CallMediaPipeline(kurento: KurentoClient, from: String, to: String?) {
     private val recorderCaller: RecorderEndpoint
     private val recorderCallee: RecorderEndpoint
 
+    val composite: Composite = Composite.Builder(pipeline).build()
+    val out = HubPort.Builder(composite).build()
+    val recorder: RecorderEndpoint = RecorderEndpoint.Builder(pipeline, RECORDING_PATH + "combined" + RECORDING_EXT)
+        .build()
+
     init {
         recorderCaller = RecorderEndpoint.Builder(pipeline, RECORDING_PATH + from + RECORDING_EXT)
             .build()
@@ -20,29 +25,26 @@ class CallMediaPipeline(kurento: KurentoClient, from: String, to: String?) {
             .build()
 
         callerWebRtcEp.connect(calleeWebRtcEp)
-        calleeWebRtcEp.connect(callerWebRtcEp)
-        val composite: Composite = Composite.Builder(pipeline).build()
-
-        val callerPort: HubPort = HubPort.Builder(composite).build()
-        val calleePort: HubPort = HubPort.Builder(composite).build()
-        val out = HubPort.Builder(composite).build()
-
-        callerWebRtcEp.connect(callerPort)
-        calleeWebRtcEp.connect(calleePort)
-
-        out.connect(recorderCallee)
-
-        // Connections
-        callerWebRtcEp.connect(calleeWebRtcEp)
         callerWebRtcEp.connect(recorderCaller)
 
         calleeWebRtcEp.connect(callerWebRtcEp)
         calleeWebRtcEp.connect(recorderCallee)
+
+        // mixing
+        val callerPort: HubPort = HubPort.Builder(composite).build()
+        val calleePort: HubPort = HubPort.Builder(composite).build()
+
+
+        callerWebRtcEp.connect(callerPort)
+        calleeWebRtcEp.connect(calleePort)
+
+        out.connect(recorder)
     }
 
     fun record() {
         recorderCaller.record()
         recorderCallee.record()
+        recorder.record()
     }
 
     fun generateSdpAnswerForCaller(sdpOffer: String?): String {
