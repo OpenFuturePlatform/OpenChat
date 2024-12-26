@@ -20,7 +20,10 @@ class AwsCognitoTokenFilter(
     defaultFilterProcessesUrl: String?,
     authenticationManager: AuthenticationManager?,
     loginUrl: String?,
-    signupUrl: String?
+    signupUrl: String?,
+    refreshTokenUrl: String?,
+    webhookUrl: String?,
+    attachmentDownloadUrl: String?
 ) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
     companion object{
         private val log = LoggerFactory.getLogger(AwsCognitoTokenFilter::class.java)
@@ -28,19 +31,21 @@ class AwsCognitoTokenFilter(
 
     private val loginRequestMatcher: RequestMatcher = AntPathRequestMatcher(loginUrl)
     private val signupRequestMatcher: RequestMatcher = AntPathRequestMatcher(signupUrl)
+    private val refreshTokenRequestMatcher: RequestMatcher = AntPathRequestMatcher(refreshTokenUrl)
+    private val webhookRequestMatcher: RequestMatcher = AntPathRequestMatcher(webhookUrl)
+    private val attachmentDownloadRequestMatcher: RequestMatcher = AntPathRequestMatcher(attachmentDownloadUrl)
 
     init {
         setAuthenticationManager(authenticationManager)
     }
 
     override fun requiresAuthentication(request: HttpServletRequest, response: HttpServletResponse): Boolean {
-        return !loginRequestMatcher.matches(request) && !signupRequestMatcher.matches(request)
+        return !loginRequestMatcher.matches(request) && !signupRequestMatcher.matches(request) && !webhookRequestMatcher.matches(request) && !attachmentDownloadRequestMatcher.matches(request) && !refreshTokenRequestMatcher.matches(request)
     }
 
     @Throws(AuthenticationException::class, IOException::class, ServletException::class)
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
         val header = request.getHeader(HttpHeaders.AUTHORIZATION)
-        log.info("Header : $header")
         if (header == null || header.isEmpty() || header.length == 6) {
             log.info("Token is not provided")
             throw AuthenticationServiceException("Token is missing")

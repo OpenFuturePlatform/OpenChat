@@ -16,7 +16,21 @@ class GeminiService (
 ) {
 
     fun chat(input: String?): String? {
-        val jsonPayload = String.format("{\"contents\":[{\"role\": \"user\", \"parts\":[{\"text\": \"%s\"}]}]}", input)
+        val jsonPayload = """
+            {
+                "contents": [
+                    {
+                        "role": "user",
+                        "parts": [
+                            {
+                                "text": "$input"
+                            }
+                        ]
+                    }
+                ]
+            }
+        """.trimIndent()
+
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         val requestEntity = HttpEntity(jsonPayload, headers)

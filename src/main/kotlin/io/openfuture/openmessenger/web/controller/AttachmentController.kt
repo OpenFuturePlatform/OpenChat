@@ -29,19 +29,7 @@ class AttachmentController (
         return attachmentService.uploadAndReturnId(file)
     }
 
-    @GetMapping(value = ["/{fileName}"], produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
-    @Throws(IOException::class)
-    fun download(response: HttpServletResponse, @PathVariable(value = "fileName") fileName: String) {
-        val fileData = attachmentService.download(fileName)
-        response.reset()
-        response.contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment$fileName")
-        response.setContentLength(fileData!!.size)
-        response.outputStream.write(fileData)
-        response.flushBuffer()
-    }
-
-    @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
+    @GetMapping(value = ["/download/{id}"], produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
     @Throws(IOException::class)
     fun download(response: HttpServletResponse, @PathVariable(value = "id") id: Int) {
         val fileData = attachmentService.downloadById(id)

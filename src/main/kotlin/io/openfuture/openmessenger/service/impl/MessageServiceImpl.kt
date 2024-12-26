@@ -60,8 +60,9 @@ class MessageServiceImpl(
     private fun getPrivateChat(request: MessageRequest): PrivateChat {
         if (request.sender == request.recipient) {
             val selfChat = privateChatRepository.findSelfChat(request.sender)
-            if (selfChat?.isPresent == true) {
-                return selfChat.get()
+
+            if (selfChat != null) {
+                return selfChat
             }
             val newPrivateChat = privateChatRepository.save(PrivateChat("SELF"))
             val singleParticipant = ChatParticipant(newPrivateChat.id, request.sender)
@@ -70,15 +71,16 @@ class MessageServiceImpl(
             return newPrivateChat
         }
         val privateChat = privateChatRepository.findPrivateChatByParticipants(request.sender, request.recipient)
-        if (privateChat?.isPresent == true) {
-            return privateChat.get()
+
+        if (privateChat != null) {
+            return privateChat
         }
         val newPrivateChat = privateChatRepository.save(PrivateChat("DEFAULT"))
         val sender = ChatParticipant(newPrivateChat.id, request.sender)
         val recipient = ChatParticipant(newPrivateChat.id, request.recipient)
         chatParticipantRepository.save(sender)
         chatParticipantRepository.save(recipient)
-        newPrivateChat.chatParticipants = java.util.List.of(sender, recipient)
+        newPrivateChat.chatParticipants = listOf(sender, recipient)
         return newPrivateChat
     }
 
@@ -94,8 +96,8 @@ class MessageServiceImpl(
             privateChat.id
         )
 
-        messageRepository.save(message)
-        request.attachments.forEach { attachment -> messageAttachmentRepository.save(MessageAttachment(attachment, message.id)) }
+        val savedMessageId = messageRepository.save(message)
+        request.attachments.forEach { attachment -> messageAttachmentRepository.save(MessageAttachment(attachment, savedMessageId)) }
 
         return MessageResponse(
             message.id,
@@ -233,8 +235,6 @@ class MessageServiceImpl(
     }
 
     private fun convertToMessageResponse(messageEntities: List<MessageEntity?>?): List<MessageResponse>? {
-
-
         return messageEntities?.map { message: MessageEntity? ->
             val attachments = messageAttachmentRepository.findAllByMessageId(message!!.id)
             MessageResponse(

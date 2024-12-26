@@ -41,9 +41,10 @@ class AuthController(val userAuthService: UserAuthService) {
     fun login(@RequestBody @Validated loginRequest: LoginRequest): LoginResponse {
         val authenticate = userAuthService.authenticate(loginRequest)
         return LoginResponse(
-            authenticate.accessToken,
-            "User logged in Successfully",
-            authenticate.refreshToken
+            token = authenticate.accessToken,
+            message = "User logged in Successfully",
+            userId = loginRequest.email,
+            refreshToken = authenticate.refreshToken
         )
     }
 
@@ -51,15 +52,10 @@ class AuthController(val userAuthService: UserAuthService) {
     fun refreshToken(@RequestBody @Validated request: RefreshTokenRequest): LoginResponse {
         val authenticate = userAuthService.refreshToken(request)
         return LoginResponse(
-            authenticate.accessToken,
-            "Token refreshed",
-            authenticate.refreshToken
+            token = authenticate.accessToken,
+            message = "Token refreshed",
+            refreshToken = authenticate.refreshToken
         )
-    }
-
-    @GetMapping("/current")
-    fun current(@AuthenticationPrincipal username: String?): ResponseEntity<String> {
-        return ResponseEntity(username, HttpStatus.OK)
     }
 
     @GetMapping("/user")

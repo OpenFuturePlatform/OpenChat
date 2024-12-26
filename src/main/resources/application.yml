@@ -8,11 +8,10 @@ spring:
     password: 123456
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
 
 aws:
-  access-key: AKIAXYKJRLFYPXI732OX
-  secret-key: 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
+  access-key: AKIAXYKJRLFYOGZSQSGZ
+  secret-key: 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
   region: us-east-2
   attachments-bucket: open-chat-attachments
   cognito:
@@ -33,3 +32,11 @@ gemini:
   api:
     key: AIzaSyDWkne0n1KzsTZWEzp3x7SaHyafjd0ueHU
     url: https://generativelanguage.googleapis.com/v1beta/models
+
+# STATE
+state:
+  base-url: ${OPEN_STATE_URL:http://localhost:8545/api}
+
+# FIREBASE
+app:
+  firebase-configuration-file: open-chat-5f7ba-firebase-adminsdk-1523p-0a596434ea.json

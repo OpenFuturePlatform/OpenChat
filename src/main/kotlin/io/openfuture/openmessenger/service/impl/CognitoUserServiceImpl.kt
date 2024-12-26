@@ -61,7 +61,11 @@ class CognitoUserServiceImpl(
             setUserPassword(request.email, request.password)
             createUserResult.user
         } catch (e: UsernameExistsException) {
-            throw UsernameExistsException("User name that already exists")
+            //throw UsernameExistsException("User name that already exists")
+            log.info("User Exists: {}", e.errorMessage)
+            val userType = UserType()
+            userType.username = request.email
+            return userType
         } catch (e: com.amazonaws.services.cognitoidp.model.InvalidPasswordException) {
             throw InvalidPasswordException("Invalid password.", e)
         }

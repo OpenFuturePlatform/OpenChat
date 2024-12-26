@@ -17,12 +17,12 @@ interface PrivateChatRepository : JpaRepository<PrivateChat?, Int?> {
     fun findPrivateChatByParticipants(
         @Param("sender") sender: String?,
         @Param("recipient") recipient: String?
-    ): Optional<PrivateChat?>?
+    ): PrivateChat?
 
     @Query(
         "SELECT pc FROM PrivateChat pc " +
                 "JOIN pc.chatParticipants cp " +
                 "WHERE cp.username = :username AND pc.type = 'SELF' "
     )
-    fun findSelfChat(username: String?): Optional<PrivateChat?>?
+    fun findSelfChat(username: String?): PrivateChat?
 }
