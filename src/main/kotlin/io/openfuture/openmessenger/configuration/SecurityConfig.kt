@@ -32,6 +32,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers("/api/v1/public/login").permitAll()
                 it.requestMatchers("/api/v1/public/signup").permitAll()
+                it.requestMatchers("/api/v1/refreshToken").permitAll()
                 it.requestMatchers("/api/v1/wallets/webhook").permitAll()
                 it.requestMatchers("/api/v1/attachments/download/**").permitAll()
                 //.requestMatchers("/**").permitAll()
@@ -43,6 +44,7 @@ class SecurityConfig(
                     authenticationManager,
                     "/api/v1/public/login",
                     "/api/v1/public/signup",
+                    "/api/v1/refreshToken",
                     "/api/v1/wallets/webhook",
                     "/api/v1/attachments/download/**"
                 ),

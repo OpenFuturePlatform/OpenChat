@@ -21,6 +21,7 @@ class AwsCognitoTokenFilter(
     authenticationManager: AuthenticationManager?,
     loginUrl: String?,
     signupUrl: String?,
+    refreshTokenUrl: String?,
     webhookUrl: String?,
     attachmentDownloadUrl: String?
 ) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
@@ -30,6 +31,7 @@ class AwsCognitoTokenFilter(
 
     private val loginRequestMatcher: RequestMatcher = AntPathRequestMatcher(loginUrl)
     private val signupRequestMatcher: RequestMatcher = AntPathRequestMatcher(signupUrl)
+    private val refreshTokenRequestMatcher: RequestMatcher = AntPathRequestMatcher(refreshTokenUrl)
     private val webhookRequestMatcher: RequestMatcher = AntPathRequestMatcher(webhookUrl)
     private val attachmentDownloadRequestMatcher: RequestMatcher = AntPathRequestMatcher(attachmentDownloadUrl)
 
@@ -38,7 +40,7 @@ class AwsCognitoTokenFilter(
     }
 
     override fun requiresAuthentication(request: HttpServletRequest, response: HttpServletResponse): Boolean {
-        return !loginRequestMatcher.matches(request) && !signupRequestMatcher.matches(request) && !webhookRequestMatcher.matches(request) && !attachmentDownloadRequestMatcher.matches(request)
+        return !loginRequestMatcher.matches(request) && !signupRequestMatcher.matches(request) && !webhookRequestMatcher.matches(request) && !attachmentDownloadRequestMatcher.matches(request) && !refreshTokenRequestMatcher.matches(request)
     }
 
     @Throws(AuthenticationException::class, IOException::class, ServletException::class)

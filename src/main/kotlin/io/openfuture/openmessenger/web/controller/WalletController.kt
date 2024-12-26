@@ -30,6 +30,7 @@ class WalletController(
     ): WalletResponse {
         val currentUser = userAuthService.current()
         val wallet = walletManagementService.saveWallet(request, currentUser.email!!)
+        println("Wallet saved: $wallet")
         stateApi.createWallet(
             wallet.address!!,
             "http://localhost:5001/api/v1/wallets/webhook",
