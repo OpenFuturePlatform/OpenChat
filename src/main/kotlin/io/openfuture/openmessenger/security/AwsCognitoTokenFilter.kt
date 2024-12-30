@@ -25,9 +25,8 @@ class AwsCognitoTokenFilter(
     allowedPages: List<String>,
     refreshTokenUrl: String?,
     webhookUrl: String?,
-    attachmentDownloadUrl: String?
 ) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
-    companion object{
+    companion object {
         private val log = LoggerFactory.getLogger(AwsCognitoTokenFilter::class.java)
     }
 
@@ -47,6 +46,8 @@ class AwsCognitoTokenFilter(
         return !loginRequestMatcher.matches(request) &&
                 !signupRequestMatcher.matches(request) &&
                 !attachmentDownloadRequestMatcher.matches(request) &&
+                !refreshTokenRequestMatcher.matches(request) &&
+                !webhookRequestMatcher.matches(request) &&
                 allowedPagesRequestMatchers.all { !it.matches(request) }
     }
 
