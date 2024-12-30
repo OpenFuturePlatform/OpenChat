@@ -20,7 +20,9 @@ aws:
   access-key: AKIAXYKJRLFYOGZSQSGZ
   secret-key: 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
   region: us-east-2
-  attachments-bucket: open-chat-attachments
+  attachments-bucket: open-attachments
+  recordings-bucket: open-recordings
+  transcripts-bucket: open-transcripts
   cognito:
     user-pool-id: us-east-2_cQqrqGoe5
     app-client-id: 661d1ashh62bvj8m9g4r2699qm

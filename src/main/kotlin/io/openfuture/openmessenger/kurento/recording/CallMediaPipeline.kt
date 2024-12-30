@@ -15,7 +15,8 @@ class CallMediaPipeline(kurento: KurentoClient, from: String, to: String?) {
 
     val composite: Composite = Composite.Builder(pipeline).build()
     val out = HubPort.Builder(composite).build()
-    val recorder: RecorderEndpoint = RecorderEndpoint.Builder(pipeline, RECORDING_PATH + "combined" + RECORDING_EXT)
+    val recordedFileUri = RECORDING_PATH + "combined" + RECORDING_EXT
+    val recorder: RecorderEndpoint = RecorderEndpoint.Builder(pipeline, recordedFileUri)
         .build()
 
     init {
@@ -57,7 +58,7 @@ class CallMediaPipeline(kurento: KurentoClient, from: String, to: String?) {
 
     companion object {
         private val df = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-S")
-        val RECORDING_PATH: String = "file:///tmp/" + df.format(Date()) + "-"
+        val RECORDING_PATH: String = "file:///tmp/recordings/" + df.format(Date()) + "-"
         const val RECORDING_EXT: String = ".webm"
     }
 }

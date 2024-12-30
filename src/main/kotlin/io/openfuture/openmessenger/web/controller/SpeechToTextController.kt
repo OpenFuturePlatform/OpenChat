@@ -29,4 +29,9 @@ class SpeechToTextController(
         return speechToTextService.extractTranscript(attachmentId)
     }
 
+    @GetMapping("/getTranscriptFromS3/{s3FileName}")
+    fun getTranscript(@PathVariable s3FileName: String): String {
+        return speechToTextService.getTranscript(s3FileName)
+    }
+
 }

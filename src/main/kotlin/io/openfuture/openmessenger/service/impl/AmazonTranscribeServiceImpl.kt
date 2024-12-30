@@ -2,6 +2,7 @@ package io.openfuture.openmessenger.service.impl
 
 import com.amazonaws.services.transcribe.AmazonTranscribe
 import com.amazonaws.services.transcribe.model.*
+import io.openfuture.openmessenger.configuration.AwsConfig
 import io.openfuture.openmessenger.service.TranscribeService
 import org.springframework.stereotype.Service
 import java.util.*
@@ -9,14 +10,15 @@ import java.util.*
 
 @Service
 class AmazonTranscribeServiceImpl(
-    private val amazonTranscribe: AmazonTranscribe
+    private val amazonTranscribe: AmazonTranscribe,
+    private val awsConfig: AwsConfig
 ): TranscribeService {
 
     override fun extractText(filename: String): String? {
 
         val transcriptionJobName = "TranscriptionJob1-$filename-${UUID.randomUUID()}"
-        val outputS3BucketName = "open-chat-attachments"
-        val inputS3BucketName = "open-chat-attachments"
+        val outputS3BucketName = awsConfig.transcriptsBucket
+        val inputS3BucketName = awsConfig.recordingsBucket
 
         val s3Filename = "s3://$inputS3BucketName/$filename"
         val myMedia: Media = Media().withMediaFileUri(s3Filename)

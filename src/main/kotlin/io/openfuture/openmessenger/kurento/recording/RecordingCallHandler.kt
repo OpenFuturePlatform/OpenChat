@@ -3,6 +3,11 @@ package io.openfuture.openmessenger.kurento.recording
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
+import io.openfuture.openmessenger.assistant.gemini.GeminiService
+import io.openfuture.openmessenger.repository.MeetingNoteRepository
+import io.openfuture.openmessenger.repository.entity.MeetingNoteEntity
+import io.openfuture.openmessenger.service.RecordingManagementService
+import io.openfuture.openmessenger.service.SpeechToTextService
 import org.kurento.client.IceCandidate
 import org.kurento.client.KurentoClient
 import org.kurento.client.MediaPipeline
@@ -14,13 +19,19 @@ import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import java.io.IOException
+import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 
 class RecordingCallHandler(
     private val kurento: KurentoClient,
     private val registry: UserRegistry,
+    private val recordingManagementService: RecordingManagementService,
+    private val speechToTextService: SpeechToTextService,
+    private val geminiService: GeminiService,
+    private val meetingNoteRepository: MeetingNoteRepository
 ): TextWebSocketHandler() {
     val pipelines = ConcurrentHashMap<String, MediaPipeline?>()
+    val recordings = ConcurrentHashMap<String, String>()
 
     @Throws(Exception::class)
     public override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
@@ -28,7 +39,7 @@ class RecordingCallHandler(
             message.payload,
             JsonObject::class.java
         )
-        val user = registry!!.getBySession(session)
+        val user = registry.getBySession(session)
 
         if (user != null) {
             log.debug("Incoming message from user '{}': {}", user.name, jsonMessage)
@@ -113,16 +124,16 @@ class RecordingCallHandler(
     private fun incomingCallResponse(callee: UserSession, jsonMessage: JsonObject) {
         val callResponse = jsonMessage["callResponse"].asString
         val from = jsonMessage["from"].asString
-        val calleer = registry!!.getByName(from)
-        val to = calleer?.callingTo
+        val caller = registry.getByName(from)
+        val to = caller?.callingTo
 
         if ("accept" == callResponse) {
             log.debug("Accepted call from '{}' to '{}'", from, to)
 
-            val callMediaPipeline = CallMediaPipeline(
-                kurento!!, from, to
-            )
-            pipelines[calleer!!.sessionId] = callMediaPipeline.pipeline
+            val callMediaPipeline = CallMediaPipeline(kurento, from, to)
+            recordings[caller!!.sessionId] = callMediaPipeline.recordedFileUri
+            recordings[callee.sessionId] = callMediaPipeline.recordedFileUri
+            pipelines[caller.sessionId] = callMediaPipeline.pipeline
             pipelines[callee.sessionId] = callMediaPipeline.pipeline
 
             callee.setWebRtcEndpoint(callMediaPipeline.calleeWebRtcEp)
@@ -153,14 +164,14 @@ class RecordingCallHandler(
 
             val callerSdpOffer = registry.getByName(from)?.sdpOffer
 
-            calleer!!.setWebRtcEndpoint(callMediaPipeline.callerWebRtcEp)
+            caller.setWebRtcEndpoint(callMediaPipeline.callerWebRtcEp)
             callMediaPipeline.callerWebRtcEp.addIceCandidateFoundListener { event ->
                 val response = JsonObject()
                 response.addProperty("id", "iceCandidate")
                 response.add("candidate", JsonUtils.toJsonObject(event.candidate))
                 try {
-                    synchronized(calleer.session) {
-                        calleer.session.sendMessage(TextMessage(response.toString()))
+                    synchronized(caller.session) {
+                        caller.session.sendMessage(TextMessage(response.toString()))
                     }
                 } catch (e: IOException) {
                     log.debug(e.message)
@@ -174,8 +185,8 @@ class RecordingCallHandler(
             response.addProperty("response", "accepted")
             response.addProperty("sdpAnswer", callerSdpAnswer)
 
-            synchronized(calleer) {
-                calleer.sendMessage(response)
+            synchronized(caller) {
+                caller.sendMessage(response)
             }
 
             callMediaPipeline.callerWebRtcEp.gatherCandidates()
@@ -185,15 +196,14 @@ class RecordingCallHandler(
             val response = JsonObject()
             response.addProperty("id", "callResponse")
             response.addProperty("response", "rejected")
-            calleer!!.sendMessage(response)
+            caller!!.sendMessage(response)
         }
     }
 
     @Throws(IOException::class)
     fun stop(session: WebSocketSession) {
-        // Both users can stop the communication. A 'stopCommunication'
-        // message will be sent to the other peer.
-        val stopperUser = registry!!.getBySession(session)
+        val stopperUser = registry.getBySession(session)
+
         if (stopperUser != null) {
             val stoppedUser =
                 if ((stopperUser.callingFrom != null))
@@ -211,6 +221,36 @@ class RecordingCallHandler(
                 stoppedUser.clear()
             }
             stopperUser.clear()
+
+            val caller = stopperUser.callingFrom ?: stoppedUser?.callingFrom
+            val callee = stopperUser.callingTo ?: stoppedUser?.callingTo
+            log.info("Caller = $caller, callee = $callee")
+
+            pipelines[stoppedUser?.sessionId]
+
+            val fileUriString = recordings[stoppedUser?.sessionId]
+            fileUriString?.let { val uploadToS3 = recordingManagementService.uploadToS3(it)
+                if (uploadToS3 == -1) {
+                    log.warn("No file was uploaded for call session ${stoppedUser?.sessionId}")
+                    return
+                }
+                val transcript = speechToTextService.extractTranscript(uploadToS3)
+                val chat = geminiService.chat("Generate a summary from the following meeting record: {$transcript}")
+
+                val meetingNoteEntity = MeetingNoteEntity(
+                    caller,
+                    777,
+                    999,
+                    "[$caller, $callee]",
+                    callee,
+                    LocalDateTime.now(),
+                    1,
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    chat
+                )
+                meetingNoteRepository.save(meetingNoteEntity)
+            }
         }
     }
 
@@ -294,11 +334,12 @@ class RecordingCallHandler(
     @Throws(Exception::class)
     override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {
         stop(session)
-        registry!!.removeBySession(session)
+        registry.removeBySession(session)
     }
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(RecordingCallHandler::class.java)
         private val gson: Gson = GsonBuilder().create()
     }
+
 }

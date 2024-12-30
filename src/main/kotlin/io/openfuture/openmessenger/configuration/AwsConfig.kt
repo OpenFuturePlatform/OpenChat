@@ -10,6 +10,8 @@ data class AwsConfig(
     var secretKey: String? = null,
     var region: String? = null,
     var attachmentsBucket: String? = null,
+    var recordingsBucket: String? = null,
+    var transcriptsBucket: String? = null,
     var cognito: Cognito = Cognito()
 )
 

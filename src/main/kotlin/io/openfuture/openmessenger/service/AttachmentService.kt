@@ -15,7 +15,7 @@ interface AttachmentService {
     fun uploadAndReturnId(file: MultipartFile): Int
 
     @Throws(IOException::class)
-    fun download(fileName: String?): ByteArray?
+    fun download(fileName: String?, bucket: String): ByteArray?
 
     fun downloadById(id: Int): ByteArray?
 }

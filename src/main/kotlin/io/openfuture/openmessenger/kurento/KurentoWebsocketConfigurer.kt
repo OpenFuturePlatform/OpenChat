@@ -1,7 +1,12 @@
 package io.openfuture.openmessenger.kurento
 
+import io.openfuture.openmessenger.assistant.gemini.GeminiService
 import io.openfuture.openmessenger.kurento.groupcall.CallHandler
 import io.openfuture.openmessenger.kurento.groupcall.RoomManager
+import io.openfuture.openmessenger.kurento.recording.RecordingCallHandler
+import io.openfuture.openmessenger.repository.MeetingNoteRepository
+import io.openfuture.openmessenger.service.RecordingManagementService
+import io.openfuture.openmessenger.service.SpeechToTextService
 import org.kurento.client.KurentoClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -10,13 +15,16 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean
-import io.openfuture.openmessenger.kurento.recording.RecordingCallHandler as RecordingCallHandler
 
 @Configuration
 @EnableWebSocket
 class KurentoWebsocketConfigurer(
     @Value("\${kms.url}")
-    val kurentoUrl: String
+    val kurentoUrl: String,
+    val recordingManagementService: RecordingManagementService,
+    private val speechToTextService: SpeechToTextService,
+    private val geminiService: GeminiService,
+    private val meetingNoteRepository: MeetingNoteRepository
 ) : WebSocketConfigurer {
     @Bean
     fun handler(): HelloWorldHandler {
@@ -63,7 +71,9 @@ class KurentoWebsocketConfigurer(
 
     @Bean
     fun callHandler(): RecordingCallHandler {
-        return RecordingCallHandler(kurentoClient(), recordingUserRegistry())
+        return RecordingCallHandler(
+            kurentoClient(), recordingUserRegistry(), recordingManagementService, speechToTextService, geminiService, meetingNoteRepository
+        )
     }
 
 }
