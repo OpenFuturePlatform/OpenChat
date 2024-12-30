@@ -56,3 +56,12 @@ server:
     key-store-type: JKS
     key-alias: kurento-selfsigned
   port: 8443
+
+
+# STATE
+state:
+  base-url: ${OPEN_STATE_URL:http://localhost:8545/api}
+
+# FIREBASE
+app:
+  firebase-configuration-file: open-chat-5f7ba-firebase-adminsdk-1523p-0a596434ea.json

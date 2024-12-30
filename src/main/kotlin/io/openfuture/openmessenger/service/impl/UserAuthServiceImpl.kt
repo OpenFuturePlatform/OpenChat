@@ -43,10 +43,9 @@ class UserAuthServiceImpl(
     }
 
     override fun refreshToken(request: RefreshTokenRequest): AuthenticatedResponse {
-        val current = current()
-        val result = cognitoUserService.refreshAccessToken(current.id, request.refreshToken)
+        val result = cognitoUserService.refreshAccessToken(request.userId, request.refreshToken)
         return AuthenticatedResponse(
-            current.email,
+            request.userId,
             result?.accessToken,
             result?.idToken,
             result?.refreshToken

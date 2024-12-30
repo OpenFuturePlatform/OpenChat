@@ -24,6 +24,7 @@ repositories {
     maven {
         url "https://maven.dcm4che.org"
     }
+    jcenter()
 }
 
 dependencies {
@@ -72,7 +73,7 @@ dependencies {
     // WebJars Locator
     implementation 'org.webjars:webjars-locator:0.46'
 
-    // 
+    //
     implementation ("org.webjars.bower:bootstrap:5.2.2")
     implementation ("org.webjars.bower:demo-console:1.5.1")
     implementation ("org.webjars.bower:draggabilly:2.1.0")
@@ -80,7 +81,7 @@ dependencies {
     implementation ("org.webjars.bower:jquery:3.6.1")
     implementation ("org.webjars.bower:jsnlog.js:2.20.1")
     implementation ("org.webjars.bower:webrtc-adapter:7.4.0")
-    
+
     implementation("org.kurento:kurento-commons:7.1.0")
     implementation("org.kurento:kurento-client:7.1.0")
     implementation("org.kurento:kurento-utils-js:7.1.0")
@@ -92,6 +93,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 
     testImplementation 'org.testcontainers:postgresql:1.19.7'
+
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 
 }
 

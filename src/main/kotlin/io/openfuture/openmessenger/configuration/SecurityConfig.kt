@@ -2,7 +2,6 @@ package io.openfuture.openmessenger.configuration
 
 import io.openfuture.openmessenger.security.AwsCognitoTokenFilter
 import io.openfuture.openmessenger.security.CognitoAuthenticationProvider
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
@@ -14,9 +13,6 @@ import org.springframework.security.config.annotation.web.configurers.SessionMan
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.web.cors.CorsConfiguration
-import org.springframework.web.cors.CorsConfigurationSource
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
@@ -36,6 +32,8 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers("/api/v1/public/login").permitAll()
                 it.requestMatchers("/api/v1/public/signup").permitAll()
+                it.requestMatchers("/api/v1/refreshToken").permitAll()
+                it.requestMatchers("/api/v1/wallets/webhook").permitAll()
                 it.requestMatchers("/api/v1/attachments/download/**").permitAll()
                 it.requestMatchers("/*").permitAll()
                 it.requestMatchers("/webjars/**").permitAll()
@@ -52,7 +50,9 @@ class SecurityConfig(
                     "/api/v1/public/login",
                     "/api/v1/public/signup",
                     "/api/v1/attachments/download/**",
-                    listOf("/*", "/webjars/**", "/js/*", "/img/*", "/css/*", "/video/*")
+                    listOf("/*", "/webjars/**", "/js/*", "/img/*", "/css/*", "/video/*"),
+                    "/api/v1/refreshToken",
+                    "/api/v1/wallets/webhook"
                 ),
                 UsernamePasswordAuthenticationFilter::class.java
             )

@@ -90,7 +90,6 @@ class AssistantServiceImpl(
         val participants: List<String>? = getParticipants(assistantRequest)
 
         val objectMapper = jacksonObjectMapper()
-        objectMapper.registerModule(JavaTimeModule())
 
         val conversation = getConversation(assistantRequest)
 
@@ -105,7 +104,6 @@ class AssistantServiceImpl(
             ?.replace("```", "")
 
         val reminderItemList = objectMapper.readValue<List<ReminderItem>>("[$result]")
-        val defaultObjectMapper = jacksonObjectMapper()
 
         val assistantReminderEntity = AssistantReminderEntity(
             current.email,
