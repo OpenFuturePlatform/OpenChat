@@ -8,13 +8,21 @@ spring:
     password: 123456
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
-
+  cloud:
+    gcp:
+      credentials:
+        location: file:/Users/beksultan/Documents/open-messanger/alien-scope-428812-i2-0794e36fcbee.json
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 aws:
-  access-key: AKIAXYKJRLFYPXI732OX
-  secret-key: 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
+  access-key: AKIAXYKJRLFYOGZSQSGZ
+  secret-key: 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
   region: us-east-2
-  attachments-bucket: open-chat-attachments
+  attachments-bucket: open-attachments
+  recordings-bucket: open-recordings
+  transcripts-bucket: open-transcripts
   cognito:
     user-pool-id: us-east-2_cQqrqGoe5
     app-client-id: 661d1ashh62bvj8m9g4r2699qm
@@ -33,3 +41,18 @@ gemini:
   api:
     key: AIzaSyDWkne0n1KzsTZWEzp3x7SaHyafjd0ueHU
     url: https://generativelanguage.googleapis.com/v1beta/models
+
+
+system:
+  GOOGLE_APPLICATION_CREDENTIALS: /Users/beksultan/Documents/open-messanger/alien-scope-428812-i2-0794e36fcbee.json
+
+kms:
+  url: ws://127.0.0.1:8888/kurento
+
+server:
+  ssl:
+    key-store: classpath:keystore.jks
+    key-store-password: kurento
+    key-store-type: JKS
+    key-alias: kurento-selfsigned
+  port: 8443

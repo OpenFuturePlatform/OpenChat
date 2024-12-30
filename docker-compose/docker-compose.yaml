@@ -27,6 +27,7 @@ services:
 
   open-chat-postgres:
     container_name: open-chat-postgres
+    hostname: open-chat-postgres
     image: postgres
     environment:
       POSTGRES_DB: open_chat
