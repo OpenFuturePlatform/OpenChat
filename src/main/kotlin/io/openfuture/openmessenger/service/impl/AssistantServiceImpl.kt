@@ -1,11 +1,9 @@
 package io.openfuture.openmessenger.service.impl
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.DeserializationConfig
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.openfuture.openmessenger.assistant.gemini.GeminiService
 import io.openfuture.openmessenger.assistant.model.*
 import io.openfuture.openmessenger.repository.MessageJdbcRepository
@@ -139,6 +137,7 @@ class AssistantServiceImpl(
         val participants: List<String>? = getParticipants(assistantRequest)
 
         val objectMapper = jacksonObjectMapper()
+        objectMapper.registerModule(JavaTimeModule())
 
         val conversation = getConversation(assistantRequest)
 
@@ -154,6 +153,8 @@ class AssistantServiceImpl(
             ?.replace("```json", "")
             ?.replace("```", "")
         val todos = objectMapper.readValue<List<Todo>>("[$result]")
+
+        val defaultObjectMapper = jacksonObjectMapper()
 
         val assistantTodoEntity = AssistantTodoEntity(
             current.email,

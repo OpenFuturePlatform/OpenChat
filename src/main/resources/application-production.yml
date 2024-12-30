@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+kms:
+  url: ${KMS_URL}
+
+server:
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-password: 12345678
+    key-store-type: PKCS12
+    key-alias: tomcat
+  port: 8443

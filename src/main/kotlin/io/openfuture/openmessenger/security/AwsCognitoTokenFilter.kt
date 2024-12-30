@@ -21,6 +21,8 @@ class AwsCognitoTokenFilter(
     authenticationManager: AuthenticationManager?,
     loginUrl: String?,
     signupUrl: String?,
+    attachmentDownloadUrl: String?,
+    allowedPages: List<String>,
     refreshTokenUrl: String?,
     webhookUrl: String?,
     attachmentDownloadUrl: String?
@@ -34,20 +36,25 @@ class AwsCognitoTokenFilter(
     private val refreshTokenRequestMatcher: RequestMatcher = AntPathRequestMatcher(refreshTokenUrl)
     private val webhookRequestMatcher: RequestMatcher = AntPathRequestMatcher(webhookUrl)
     private val attachmentDownloadRequestMatcher: RequestMatcher = AntPathRequestMatcher(attachmentDownloadUrl)
+    private val allowedPagesRequestMatchers: List<RequestMatcher> =
+        allowedPages.map { AntPathRequestMatcher(it) }
 
     init {
         setAuthenticationManager(authenticationManager)
     }
 
     override fun requiresAuthentication(request: HttpServletRequest, response: HttpServletResponse): Boolean {
-        return !loginRequestMatcher.matches(request) && !signupRequestMatcher.matches(request) && !webhookRequestMatcher.matches(request) && !attachmentDownloadRequestMatcher.matches(request) && !refreshTokenRequestMatcher.matches(request)
+        return !loginRequestMatcher.matches(request) &&
+                !signupRequestMatcher.matches(request) &&
+                !attachmentDownloadRequestMatcher.matches(request) &&
+                allowedPagesRequestMatchers.all { !it.matches(request) }
     }
 
     @Throws(AuthenticationException::class, IOException::class, ServletException::class)
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
         val header = request.getHeader(HttpHeaders.AUTHORIZATION)
         if (header == null || header.isEmpty() || header.length == 6) {
-            log.info("Token is not provided")
+            log.info("Url=${request.requestURL} Token is not provided")
             throw AuthenticationServiceException("Token is missing")
         }
         val token = header.substring("Bearer ".length)

@@ -9,6 +9,7 @@ import io.openfuture.openmessenger.service.AttachmentService
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
+import java.io.InputStream
 
 @Service
 class AttachmentServiceImpl(
@@ -26,6 +27,11 @@ class AttachmentServiceImpl(
         attachmentRepository.save(file.originalFilename)
     }
 
+    override fun upload(name: String, fileInputStream: InputStream) {
+        val data = ObjectMetadata()
+        amazonS3.putObject(awsConfig.attachmentsBucket, name, fileInputStream, data)
+    }
+
     override fun uploadAndReturnId(file: MultipartFile): Int {
         val data = ObjectMetadata()
         data.contentType = file.contentType
@@ -36,8 +42,8 @@ class AttachmentServiceImpl(
     }
 
     @Throws(IOException::class)
-    override fun download(fileName: String?): ByteArray? {
-        val o = amazonS3.getObject(awsConfig.attachmentsBucket, fileName)
+    override fun download(fileName: String?, bucket: String): ByteArray? {
+        val o = amazonS3.getObject(bucket, fileName)
         val s3is = o.objectContent
         return IOUtils.toByteArray(s3is)
     }
@@ -49,12 +55,6 @@ class AttachmentServiceImpl(
         val o = amazonS3.getObject(awsConfig.attachmentsBucket, fileName)
         val s3is = o.objectContent
         return IOUtils.toByteArray(s3is)
-    }
-
-    fun uploadAsynchronously(fileName: String?, file: MultipartFile) {
-
-
-
     }
 
 }
