@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: open-chat
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5434/open_chat
+    username: postgres
+    password: 123456
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+aws:
+  access-key:
+  secret-key:
+  region:
+  attachments-bucket:
+  recordings-bucket:
+  transcripts-bucket:
+  cognito:
+    user-pool-id:
+    app-client-id:
+    app-client-secret:
+
+jwks:
+  url:
+
+openai:
+  model: gpt-3.5-turbo-0301
+  api:
+    url: https://api.openai.com/v1/chat/completions
+    key:
+
+gemini:
+  api:
+    key:
+    url: https://generativelanguage.googleapis.com/v1beta/models
+
+kms:
+  url: ws://127.0.0.1:8888/kurento
+
+server:
+  ssl:
+    key-store: classpath:keystore.jks
+    key-store-password: kurento
+    key-store-type: JKS
+    key-alias: kurento-selfsigned
+  port: 8443
+
+
+# STATE
+state:
+  base-url: ${OPEN_STATE_URL:http://localhost:8545/api}
+
+# FIREBASE
+app:
+  firebase-configuration-json:

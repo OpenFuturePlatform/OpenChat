@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="./img/kurento.png" type="image/png" />
+
+    <link rel="stylesheet"
+          href="webjars/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="webjars/ekko-lightbox/dist/ekko-lightbox.min.css">
+    <link rel="stylesheet" href="css/recording-page.css">
+
+    <script src="webjars/jquery/dist/jquery.min.js"></script>
+    <script src="webjars/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="webjars/ekko-lightbox/dist/ekko-lightbox.min.js"></script>
+    <script src="webjars/draggabilly/dist/draggabilly.pkgd.min.js"></script>
+    <script src="/webjars/webrtc-adapter/release/adapter.js"></script>
+
+    <script src="./js/kurento-utils.js"></script>
+    <script src="./js/recording.js"></script>
+</head>
+<body>
+<header>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="collapse navbar-collapse"
+                 id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a
+                            href="https://github.com/Kurento/kurento/tree/main/tutorials/java/one2one-call-recording"><span
+                            class="glyphicon glyphicon-file"></span> Source Code</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container">
+    <div class="row">
+        <div class="col-md-5">
+            <label class="control-label" for="name">Name</label>
+            <div class="row">
+                <div class="col-md-5">
+                    <input id="name" name="name" class="form-control" type="text"
+                           onkeydown="if (event.keyCode == 13) register();" />
+                </div>
+                <div class="col-md-7 text-right">
+                    <a id="register" href="#" class="btn btn-primary"><span
+                            class="glyphicon glyphicon-plus"></span> Register</a>
+                </div>
+            </div>
+
+            <br /> <br /> <label class="control-label" for="peer">Peer</label>
+            <div class="row">
+                <div class="col-md-5">
+                    <input id="peer" name="peer" class="form-control" type="text"
+                           onkeydown="if (event.keyCode == 13) call();">
+                </div>
+                <div class="col-md-7 text-right">
+                    <a id="call" href="#" class="btn btn-success"><span
+                            class="glyphicon glyphicon-play"></span> Call</a> <a id="terminate"
+                                                                                 href="#" class="btn btn-danger"><span
+                        class="glyphicon glyphicon-stop"></span> Stop</a> <a id="play"
+                                                                             href="#" class="btn btn-warning"><span
+                        class="glyphicon glyphicon-play-circle"></span>Play Rec</a>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div id="videoBig">
+                <video id="videoOutput" autoplay width="640px" height="480px"></video>
+            </div>
+            <div id="videoSmall">
+                <video id="videoInput" autoplay width="240px" height="180px"></video>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

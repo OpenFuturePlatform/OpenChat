@@ -1,0 +1,99 @@
+name: Build
+
+on:
+  push: null
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          architecture: x64
+      - name: Set Gradle User Home
+        run: export GRADLE_USER_HOME=$(pwd)/.gradle
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v2
+        with:
+          path: .gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Cache Gradle Wrapper
+        uses: actions/cache@v2
+        with:
+          path: .gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Gradle build
+        run: ./gradlew clean build --parallel
+  prepareDockerImage:
+    needs: build
+    name: Prepare docker images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          architecture: x64
+      - name: Build Jar
+        run: ./gradlew bootJar
+      - name: Build login
+        run: docker login -u ${{ vars.DOCKER_USER }} -p ${{ secrets.DOCKER_PASS }}
+      - name: Build docker image
+        run: docker build -t iceknight07/open-chat:latest .
+      - name: Push docker image
+        run: docker push iceknight07/open-chat:latest
+  deploy:
+    needs: prepareDockerImage
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH connection
+        run: |
+          eval $(ssh-agent -s)
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan ${{ vars.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          echo "${{ secrets.DEPLOY_KEY }}" | tr -d '\r' > ~/.ssh/private.key
+          chmod 600 ~/.ssh/private.key
+      - name: Run command
+        run: |
+          ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
+            "docker stop open-chat-server || true"
+          ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
+            "docker rm open-chat-server || true"
+          ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
+            "docker rmi iceknight07/open-chat:latest || true"
+          ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
+            "docker run --name open-chat-server --network=open-chat-network -p 443:8443 -d \
+              -e SPRING_PROFILES_ACTIVE=production \
+              -e POSTGRES_URL=${{ secrets.POSTGRES_URL }} \
+              -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+              -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+              -e KMS_URL=${{ secrets.KMS_URL }} \
+              -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
+              -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
+              -e AWS_REGION=${{ vars.REGION }} \
+              -e ATTACHMENTS_BUCKET=${{ vars.ATTACHMENTS_BUCKET }} \
+              -e RECORDINGS_BUCKET=${{ vars.RECORDINGS_BUCKET }} \
+              -e TRANSCRIPTS_BUCKET=${{ vars.TRANSCRIPTS_BUCKET }} \
+              -e COGNITO_USER_POOL_ID=${{ secrets.COGNITO_USER_POOL_ID }} \
+              -e COGNITO_APP_CLIENT_ID=${{ secrets.COGNITO_APP_CLIENT_ID }} \
+              -e COGNITO_APP_CLIENT_SECRET=${{ secrets.COGNITO_APP_CLIENT_SECRET }} \
+              -e JWKS_URL=${{ secrets.JWKS_URL }} \
+              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+              -e GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} \
+              -e FIREBASE_CONFIGURATION_JSON=${{ secrets.FIREBASE_CONFIGURATION_JSON }} \
+              -e SSL_KEY_STORE_PASSWORD=${{ secrets.SSL_KEY_STORE_PASSWORD }} \
+              iceknight07/open-chat:latest"
