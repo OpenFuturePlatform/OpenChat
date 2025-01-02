@@ -5,13 +5,41 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
+aws:
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+  region: ${AWS_REGION}
+  attachments-bucket: ${ATTACHMENTS_BUCKET}
+  recordings-bucket: ${RECORDINGS_BUCKET}
+  transcripts-bucket: ${TRANSCRIPTS_BUCKET}
+  cognito:
+    user-pool-id: ${COGNITO_USER_POOL_ID}
+    app-client-id: ${COGNITO_APP_CLIENT_ID}
+    app-client-secret: ${COGNITO_APP_CLIENT_SECRET}
+
+jwks:
+  url: ${JWKS_URL}
+
+openai:
+  model: gpt-3.5-turbo-0301
+  api:
+    url: https://api.openai.com/v1/chat/completions
+    key: ${OPENAI_API_KEY}
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}
+    url: https://generativelanguage.googleapis.com/v1beta/models
+app:
+  firebase-configuration-json: ${FIREBASE_CONFIGURATION_JSON}
+
 kms:
   url: ${KMS_URL}
 
 server:
   ssl:
     key-store: classpath:keystore.p12
-    key-store-password: 12345678
+    key-store-password: ${SSL_KEY_STORE_PASSWORD}
     key-store-type: PKCS12
     key-alias: tomcat
   port: 8443

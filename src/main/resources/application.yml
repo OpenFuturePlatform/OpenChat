@@ -8,43 +8,35 @@ spring:
     password: 123456
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-  cloud:
-    gcp:
-      credentials:
-        location: file:/Users/beksultan/Documents/open-messanger/alien-scope-428812-i2-0794e36fcbee.json
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
 aws:
-  access-key: ${AWS_ACCESS_KEY}
-  secret-key: ${AWS_SECRET_KEY}
-  region: us-east-2
-  attachments-bucket: ${AWS_ATTACHMENTS_BUCKET}
-  recordings-bucket: ${AWS_RECORDINGS_BUCKET}
-  transcripts-bucket: ${AWS_TRANSCRIPTS_BUCKET}
+  access-key:
+  secret-key:
+  region:
+  attachments-bucket:
+  recordings-bucket:
+  transcripts-bucket:
   cognito:
-    user-pool-id: ${AWS_COGNITO_USER_POOL_ID}
-    app-client-id: ${AWS_COGNITO_APP_CLIENT_ID}
-    app-client-secret: ${AWS_COGNITO_APP_CLIENT_SECRET}
+    user-pool-id:
+    app-client-id:
+    app-client-secret:
 
 jwks:
-  url: ${AWS_COGNITO_JWKS_URL}
+  url:
 
 openai:
-  model: ${OPENAI_MODEL}
+  model: gpt-3.5-turbo-0301
   api:
-    url: ${OPENAI_API_URL}
-    key: ${OPENAI_API_KEY}
+    url: https://api.openai.com/v1/chat/completions
+    key:
 
 gemini:
   api:
-    key: ${GEMINI_API_KEY}
-    url: ${GEMINI_API_URL}
-
-
-system:
-  GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
+    key:
+    url: https://generativelanguage.googleapis.com/v1beta/models
 
 kms:
   url: ws://127.0.0.1:8888/kurento
@@ -64,4 +56,4 @@ state:
 
 # FIREBASE
 app:
-  firebase-configuration-file: ${FIREBASE_CONFIG_FILE}
+  firebase-configuration-json:

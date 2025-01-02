@@ -77,9 +77,22 @@ jobs:
             "docker rmi iceknight07/open-chat:latest || true"
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
             "docker run --name open-chat-server --network=open-chat-network -p 443:8443 -d \
-              -e POSTGRES_URL=open-chat-postgres:5432/open_chat \
-              -e POSTGRES_USER=postgres \
-              -e POSTGRES_PASSWORD=12345678 \
-              -e KMS_URL=ws://kurento-media-server:8888/kurento \
-              -e SPRING_PROFILES_ACTIVE=production \
+              -e POSTGRES_URL=${{ secrets.POSTGRES_URL }} \
+              -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+              -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+              -e KMS_URL=${{ secrets.KMS_URL }} \
+              -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
+              -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
+              -e AWS_REGION=${{ secrets.REGION }} \
+              -e ATTACHMENTS_BUCKET=${{ secrets.ATTACHMENTS_BUCKET }} \
+              -e RECORDINGS_BUCKET=${{ secrets.RECORDINGS_BUCKET }} \
+              -e TRANSCRIPTS_BUCKET=${{ secrets.TRANSCRIPTS_BUCKET }} \
+              -e COGNITO_USER_POOL_ID=${{ secrets.COGNITO_USER_POOL_ID }} \
+              -e COGNITO_APP_CLIENT_ID=${{ secrets.COGNITO_APP_CLIENT_ID }} \
+              -e COGNITO_APP_CLIENT_SECRET=${{ secrets.COGNITO_APP_CLIENT_SECRET }} \
+              -e JWKS_URL=${{ secrets.JWKS_URL }} \
+              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+              -e GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} \
+              -e FIREBASE_CONFIGURATION_JSON=${{ secrets.FIREBASE_CONFIGURATION_JSON }} \
+              -e SSL_KEY_STORE_PASSWORD=${{ secrets.SSL_KEY_STORE_PASSWORD }} \
               iceknight07/open-chat:latest"

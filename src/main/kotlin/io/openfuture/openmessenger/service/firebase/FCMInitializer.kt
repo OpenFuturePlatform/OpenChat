@@ -15,8 +15,8 @@ import javax.annotation.PostConstruct
 @Service
 class FCMInitializer {
 
-    @Value("\${app.firebase-configuration-file}")
-    private val firebaseConfigPath: String? = null
+    @Value("\${app.firebase-configuration-json}")
+    private val firebaseConfigJson: String? = null
 
     var logger: Logger = LoggerFactory.getLogger(FCMInitializer::class.java)
 
@@ -24,7 +24,7 @@ class FCMInitializer {
     fun initialize() {
         try {
             val options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(ClassPathResource(firebaseConfigPath!!).getInputStream()))
+                .setCredentials(GoogleCredentials.fromStream(firebaseConfigJson!!.byteInputStream()))
                 .build()
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options)
