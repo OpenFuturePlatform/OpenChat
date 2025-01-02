@@ -17,34 +17,34 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 aws:
-  access-key: AKIAXYKJRLFYOGZSQSGZ
-  secret-key: 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
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
   region: us-east-2
-  attachments-bucket: open-attachments
-  recordings-bucket: open-recordings
-  transcripts-bucket: open-transcripts
+  attachments-bucket: ${AWS_ATTACHMENTS_BUCKET}
+  recordings-bucket: ${AWS_RECORDINGS_BUCKET}
+  transcripts-bucket: ${AWS_TRANSCRIPTS_BUCKET}
   cognito:
-    user-pool-id: us-east-2_cQqrqGoe5
-    app-client-id: 661d1ashh62bvj8m9g4r2699qm
-    app-client-secret: 1o94g0mtth93frsihfuocl79918muchdc5iaikjcohokbvk8uc03
+    user-pool-id: ${AWS_COGNITO_USER_POOL_ID}
+    app-client-id: ${AWS_COGNITO_APP_CLIENT_ID}
+    app-client-secret: ${AWS_COGNITO_APP_CLIENT_SECRET}
 
 jwks:
-  url: https://cognito-idp.us-east-2.amazonaws.com/us-east-2_cQqrqGoe5/.well-known/jwks.json
+  url: ${AWS_COGNITO_JWKS_URL}
 
 openai:
-  model: gpt-3.5-turbo-0301
+  model: ${OPENAI_MODEL}
   api:
-    url: https://api.openai.com/v1/chat/completions
-    key: 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
+    url: ${OPENAI_API_URL}
+    key: ${OPENAI_API_KEY}
 
 gemini:
   api:
-    key: AIzaSyDWkne0n1KzsTZWEzp3x7SaHyafjd0ueHU
-    url: https://generativelanguage.googleapis.com/v1beta/models
+    key: ${GEMINI_API_KEY}
+    url: ${GEMINI_API_URL}
 
 
 system:
-  GOOGLE_APPLICATION_CREDENTIALS: /Users/beksultan/Documents/open-messanger/alien-scope-428812-i2-0794e36fcbee.json
+  GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
 
 kms:
   url: ws://127.0.0.1:8888/kurento
@@ -64,4 +64,4 @@ state:
 
 # FIREBASE
 app:
-  firebase-configuration-file: open-chat-5f7ba-firebase-adminsdk-1523p-0a596434ea.json
+  firebase-configuration-file: ${FIREBASE_CONFIG_FILE}
