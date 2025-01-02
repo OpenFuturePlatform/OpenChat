@@ -77,6 +77,7 @@ jobs:
             "docker rmi iceknight07/open-chat:latest || true"
           ssh -i ~/.ssh/private.key ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} \
             "docker run --name open-chat-server --network=open-chat-network -p 443:8443 -d \
+              -e SPRING_PROFILES_ACTIVE=production \
               -e POSTGRES_URL=${{ secrets.POSTGRES_URL }} \
               -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
               -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
