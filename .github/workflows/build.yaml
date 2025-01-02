@@ -84,10 +84,10 @@ jobs:
               -e KMS_URL=${{ secrets.KMS_URL }} \
               -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
               -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
-              -e AWS_REGION=${{ secrets.REGION }} \
-              -e ATTACHMENTS_BUCKET=${{ secrets.ATTACHMENTS_BUCKET }} \
-              -e RECORDINGS_BUCKET=${{ secrets.RECORDINGS_BUCKET }} \
-              -e TRANSCRIPTS_BUCKET=${{ secrets.TRANSCRIPTS_BUCKET }} \
+              -e AWS_REGION=${{ vars.REGION }} \
+              -e ATTACHMENTS_BUCKET=${{ vars.ATTACHMENTS_BUCKET }} \
+              -e RECORDINGS_BUCKET=${{ vars.RECORDINGS_BUCKET }} \
+              -e TRANSCRIPTS_BUCKET=${{ vars.TRANSCRIPTS_BUCKET }} \
               -e COGNITO_USER_POOL_ID=${{ secrets.COGNITO_USER_POOL_ID }} \
               -e COGNITO_APP_CLIENT_ID=${{ secrets.COGNITO_APP_CLIENT_ID }} \
               -e COGNITO_APP_CLIENT_SECRET=${{ secrets.COGNITO_APP_CLIENT_SECRET }} \
